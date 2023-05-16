@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.vin.MainActivity;
@@ -14,32 +15,35 @@ import com.example.vin.R;
 
 public class VerficationEmailActivity extends AppCompatActivity {
     private Button bth_verfication_email;
+    String verication_code;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verfication_email);
 
-        bth_verfication_email = findViewById(R.id.bth_verfication_email);
+          EditText editText = findViewById(R.id.Verfication_Email_Code);
 
+        bth_verfication_email = findViewById(R.id.bth_verfication_email);
         bth_verfication_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                 verication_code = editText.getText().toString().trim();
+                if(verication_code.length() == 0){
+                    Toast.makeText(VerficationEmailActivity.this, "Помилка: поле пусте!", Toast.LENGTH_SHORT).show();
+                }
+                else if(verication_code.equals("123456") ){
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("isFirstRun", false);
+                    editor.apply();
 
-                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("isFirstRun", false);
-                editor.apply();
-
-                Intent myIntent = new Intent(VerficationEmailActivity.this, MainActivity.class);
-                VerficationEmailActivity.this.startActivity(myIntent);
-                finish();
-//                SharedPreferences login = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
-//                SharedPreferences.Editor edit = login.edit();
-//                edit.putString("email", email);
-//                edit.apply();
-
-                // Обработка нажатия кнопки
-                // Вы можете выполнить здесь необходимые действия при нажатии кнопки
+                    Intent myIntent = new Intent(VerficationEmailActivity.this, MainActivity.class);
+                    VerficationEmailActivity.this.startActivity(myIntent);
+                    finish();
+                }
+                else {
+                    Toast.makeText(VerficationEmailActivity.this, "Помилка: Ви ввели не те!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

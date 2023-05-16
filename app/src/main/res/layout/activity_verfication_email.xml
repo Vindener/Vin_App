@@ -13,7 +13,7 @@
         android:layout_marginStart="179dp"
         android:layout_marginTop="275dp"
         android:layout_marginEnd="174dp"
-        android:text="TextView"
+        android:text="Введіть код підтвердження "
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,13 +25,13 @@
         android:layout_marginStart="158dp"
         android:layout_marginTop="34dp"
         android:layout_marginEnd="159dp"
-        android:text="Button"
+        android:text="Далі"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
+        app:layout_constraintTop_toBottomOf="@+id/Verfication_Email_Code" />
 
     <EditText
-        android:id="@+id/editTextNumber"
+        android:id="@+id/Verfication_Email_Code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="101dp"

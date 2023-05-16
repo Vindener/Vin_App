@@ -3,8 +3,11 @@ package com.example.vin;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+
+import com.example.vin.login.LoginActivity;
 
 public class LoadActivity extends AppCompatActivity {
 
@@ -12,9 +15,18 @@ public class LoadActivity extends AppCompatActivity {
     final Runnable r = new Runnable() {
         public void run() {
            // setContentView(R.layout.activity_main);
-            Intent myIntent = new Intent(LoadActivity.this, MainActivity.class);
-            LoadActivity.this.startActivity(myIntent);
-            finish();
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            boolean isFirstRun = sharedPreferences.getBoolean("isFirstRun", true);
+            if (isFirstRun) {
+                Intent myIntent = new Intent(LoadActivity.this, LoginActivity.class);
+                LoadActivity.this.startActivity(myIntent);
+                finish();
+            }
+            else{
+                Intent myIntent = new Intent(LoadActivity.this, MainActivity.class);
+                LoadActivity.this.startActivity(myIntent);
+                finish();
+            }
         }
     };
 

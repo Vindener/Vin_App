@@ -68,7 +68,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     public void scanCode(){
         ScanOptions options = new ScanOptions();
-        options.setPrompt("Volume up to flash on");
+        options.setPrompt("Кнопку гучності вверх - включити ліхтар \n Кнопку гучності вниз - виключити");
         options.setBeepEnabled(true);
         options.setOrientationLocked(true);
         options.setCaptureActivity(QrCodeScanner.class);

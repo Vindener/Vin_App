@@ -17,6 +17,12 @@
         tools:layout="@layout/fragment_documentation" />
 
     <fragment
+        android:id="@+id/nav_logout"
+        android:name="com.example.vin.ui.logout.LogOutFragment"
+        android:label="Вихід"
+        tools:layout="@layout/fragment_log_out" />
+
+    <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.vin.ui.home.ProfileFragment"
         android:label="Profile"

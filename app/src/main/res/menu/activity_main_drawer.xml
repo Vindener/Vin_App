@@ -29,7 +29,7 @@
             android:icon="@drawable/ic_menu_gallery"
             android:title="Документація" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Вихід" />
     </group>

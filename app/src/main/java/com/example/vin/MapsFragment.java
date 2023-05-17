@@ -7,10 +7,12 @@ import androidx.annotation.Nullable;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +41,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Button bthQRCodeScanner;
 
+    public static boolean isLocationEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    public static void openLocationSettings(Context context) {
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        context.startActivity(intent);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+
+
+        if (isLocationEnabled(requireActivity())) {
+            // Местоположение включено
+        } else {
+            openLocationSettings(requireActivity());
+        }
 
         bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
         bthQRCodeScanner.setOnClickListener(new View.OnClickListener() {

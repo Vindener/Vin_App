@@ -9,6 +9,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -29,16 +31,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
+    private Polygon polygonMap;
     private Button btnShowCurrentLocation;
-
     private Button bthQRCodeScanner;
 
     public static boolean isLocationEnabled(Context context) {
@@ -51,10 +57,40 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         context.startActivity(intent);
     }
 
+    public void DrawPolygon(){
+        // Создаем массив с координатами
+        LatLng[] coordinates = new LatLng[10];
+        coordinates[0] = new LatLng(49.944961, 28.611455);
+        coordinates[1] = new LatLng(49.939776, 28.617922);
+        coordinates[2] = new LatLng(49.930024, 28.627584);
+        coordinates[3] = new LatLng(49.900735, 28.632276);
+        coordinates[4] = new LatLng(49.860025, 28.615820);
+        coordinates[5] = new LatLng(49.873121, 28.568991);
+        coordinates[6] = new LatLng(49.876661, 28.554013);
+        coordinates[7] = new LatLng(49.907011, 28.556739);
+        coordinates[8] = new LatLng(49.933163, 28.586319);
+        coordinates[9] = new LatLng(49.942839, 28.603362);
+
+        // Создаем объект PolygonOptions
+        PolygonOptions polygonOptions = new PolygonOptions();
+        polygonOptions.strokeWidth(5);
+        polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
+        polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
+
+        // Добавляем координаты в PolygonOptions
+        for (LatLng coordinate : coordinates) {
+            polygonOptions.add(coordinate);
+        }
+
+
+        // Добавляем полигон на карту
+        polygonMap = mMap.addPolygon(polygonOptions);
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
-
 
         if (isLocationEnabled(requireActivity())) {
             // Местоположение включено
@@ -79,10 +115,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+
         }
 
         return view;
     }
+
 
 
     public void scanCode(){
@@ -105,6 +143,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         showCurrentLocation();
+
+        DrawPolygon();
     }
     private static final int REQUEST_LOCATION_PERMISSION = 123;
     private void showCurrentLocation() {

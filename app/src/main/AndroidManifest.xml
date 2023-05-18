@@ -23,7 +23,8 @@
         tools:targetApi="31">
         <activity
             android:name=".login.CreateNewUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Vin.NoActionBar"/>
         <activity
             android:name=".login.VerficationEmailActivity"
             android:exported="false"

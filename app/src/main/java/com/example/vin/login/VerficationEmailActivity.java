@@ -15,13 +15,17 @@ import com.example.vin.R;
 
 public class VerficationEmailActivity extends AppCompatActivity {
     private Button bth_verfication_email;
-    String verication_code;
+    private String verication_code;
+
+    private String email;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verfication_email);
 
-          EditText editText = findViewById(R.id.Verfication_Email_Code);
+        EditText editText = findViewById(R.id.Verfication_Email_Code);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        email = sharedPreferences.getString("email","");
 
         bth_verfication_email = findViewById(R.id.bth_verfication_email);
         bth_verfication_email.setOnClickListener(new View.OnClickListener() {
@@ -32,14 +36,24 @@ public class VerficationEmailActivity extends AppCompatActivity {
                     Toast.makeText(VerficationEmailActivity.this, "Помилка: поле пусте!", Toast.LENGTH_SHORT).show();
                 }
                 else if(verication_code.equals("123456") ){
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putBoolean("isFirstRun", false);
-                    editor.apply();
+                    //якщо такого користувача ще немає
+                    if(email.equals("user@user.com")){
+                        Toast.makeText(VerficationEmailActivity.this, "User", Toast.LENGTH_SHORT).show();
+                        Intent myIntent = new Intent(VerficationEmailActivity.this, CreateNewUserActivity.class);
+                        VerficationEmailActivity.this.startActivity(myIntent);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(VerficationEmailActivity.this, "Not User", Toast.LENGTH_SHORT).show();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("isFirstRun", false);
+                        editor.apply();
 
-                    Intent myIntent = new Intent(VerficationEmailActivity.this, MainActivity.class);
-                    VerficationEmailActivity.this.startActivity(myIntent);
-                    finish();
+                        Intent myIntent = new Intent(VerficationEmailActivity.this, MainActivity.class);
+                        VerficationEmailActivity.this.startActivity(myIntent);
+                        finish();
+                    }
+
                 }
                 else {
                     Toast.makeText(VerficationEmailActivity.this, "Помилка: Ви ввели не те!", Toast.LENGTH_SHORT).show();

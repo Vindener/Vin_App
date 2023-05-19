@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/nav_profile"
-        android:name="com.example.vin.ui.home.ProfileFragment"
+        android:name="com.example.vin.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
 

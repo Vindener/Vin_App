@@ -1,4 +1,4 @@
-package com.example.vin.ui.home;
+package com.example.vin.ui.profile;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

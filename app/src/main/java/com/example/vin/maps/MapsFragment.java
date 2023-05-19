@@ -1,4 +1,4 @@
-package com.example.vin;
+package com.example.vin.maps;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
@@ -21,13 +22,16 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,9 +40,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -52,6 +58,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Polygon polygonMap;
     private Button btnShowCurrentLocation;
     private Button bthQRCodeScanner;
+
+    private Marker marker;
 
     public static boolean isLocationEnabled(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -151,7 +159,41 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         DrawPolygon();
 
         showTransport();
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                // Обработка клика по маркеру
+                String markerId = marker.getId(); // Получение id маркера
+                // Отображение нижнего окна активити с текстом и кнопками
+                showBottomSheet(markerId);
+                return true;
+            }
+        });
+
     }
+
+    private void showBottomSheet(String markerId) {
+        // Создание нижнего окна активити
+        Context context = requireContext();
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
+
+        bottomSheetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        bottomSheetDialog.setContentView(R.layout.bottom_sheet_layout);
+
+        TextView textView = bottomSheetDialog.findViewById(R.id.textView);
+        Button button1 = bottomSheetDialog.findViewById(R.id.button1);
+        Button button2 = bottomSheetDialog.findViewById(R.id.button2);
+
+        textView.setText(markerId);
+
+        // Настройка текста и обработчиков кнопок
+        // Используйте markerId для получения информации о маркере
+
+        bottomSheetDialog.show();
+    }
+
+
     private static final int REQUEST_LOCATION_PERMISSION = 123;
     private void showCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&

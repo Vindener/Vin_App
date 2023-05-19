@@ -1,4 +1,4 @@
-package com.example.vin.addition;
+package com.example.vin.server;
 import android.content.Intent;
 import android.os.AsyncTask;
 import java.io.BufferedReader;

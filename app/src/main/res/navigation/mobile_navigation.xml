@@ -17,6 +17,12 @@
         tools:layout="@layout/fragment_documentation" />
 
     <fragment
+        android:id="@+id/nav_list"
+        android:name="com.example.vin.list.ListFragment"
+        android:label="Історія поїздок"
+        tools:layout="@layout/fragment_list" />
+
+    <fragment
         android:id="@+id/nav_logout"
         android:name="com.example.vin.ui.logout.LogOutFragment"
         android:label="Вихід"
@@ -35,9 +41,4 @@
         android:label="@string/menu_gallery"
         tools:layout="@layout/fragment_gallery" />
 
-    <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.vin.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
 </navigation>

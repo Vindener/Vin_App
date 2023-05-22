@@ -88,6 +88,8 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         TripStart = false;
         ShowContainer();
+
+        MapsFragment.TripStarted();
     }
 
     private void ShowContainer(){

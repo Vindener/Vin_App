@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import android.Manifest;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,11 +60,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Polygon polygonMap;
     private Button btnShowCurrentLocation;
     private Button bthQRCodeScanner;
-    private Button bthEndTrip;
+    private static Button bthEndTrip;
+    private static Button bthGoToTrip;
 
     private Button bthShowCurrentTrip;
 
     private Marker marker;
+
+    static Context context;
 
     public static boolean isLocationEnabled(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -128,6 +132,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         bthEndTrip =  view.findViewById(R.id.bthEndTrip);
 
+        bthGoToTrip =  view.findViewById(R.id.GoToTrip);
+
         bthEndTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { EndTrip();}
@@ -154,6 +160,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             mapFragment.getMapAsync(this);
 
         }
+
+        context = getContext();
 
         return view;
     }
@@ -270,10 +278,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         bthEndTrip.setVisibility(View.GONE);
     }
 
-    public void TripStarted(){
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+
+    public static void TripStarted(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
         boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
-        Button bthGoToTrip = getActivity().findViewById(R.id.GoToTrip);
 
         if (TripStarted) {
             bthGoToTrip.setVisibility(View.VISIBLE);

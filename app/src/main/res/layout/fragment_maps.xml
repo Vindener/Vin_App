@@ -27,4 +27,22 @@
         android:layout_height="match_parent"
         tools:context=".maps.MapsFragment" />
 
+    <Button
+        android:id="@+id/GoToTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|top"
+        android:text="У вас активна поїздка!"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
+    <Button
+        android:id="@+id/bthEndTrip"
+        android:layout_width="125dp"
+        android:layout_height="69dp"
+        android:layout_gravity="start|center_vertical"
+        android:text="Закінчити поїздку"
+        android:visibility="gone"
+        tools:visibility="gone" />
+
 </FrameLayout>

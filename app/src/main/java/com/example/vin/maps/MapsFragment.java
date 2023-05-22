@@ -1,18 +1,19 @@
 package com.example.vin.maps;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import android.Manifest;
-import android.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -22,7 +23,6 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,9 +30,15 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.example.vin.LoadActivity;
+import com.example.vin.MainActivity;
 import com.example.vin.R;
+import com.example.vin.login.LoginActivity;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
+import com.example.vin.trip.CurrentTripActivity;
+import com.example.vin.trip.CurrentTripFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -48,16 +54,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-
-import java.security.Permission;
-import java.util.ArrayList;
-import java.util.List;
-
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private Polygon polygonMap;
     private Button btnShowCurrentLocation;
     private Button bthQRCodeScanner;
+    private Button bthEndTrip;
+
+    private Button bthShowCurrentTrip;
 
     private Marker marker;
 
@@ -96,9 +100,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             polygonOptions.add(coordinate);
         }
 
+        //Клікабельність але поки не розібрався
+        //polygonOptions.clickable(true);
+
 
         // Добавляем полигон на карту
         polygonMap = mMap.addPolygon(polygonOptions);
+
 
     }
 
@@ -118,11 +126,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) { scanCode();  }
         });
 
+        bthEndTrip =  view.findViewById(R.id.bthEndTrip);
+
+        bthEndTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { EndTrip();}
+        });
+
         btnShowCurrentLocation = view.findViewById(R.id.btnShowCurrentLocation);
         btnShowCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCurrentLocation();
+            }
+        });
+
+        bthShowCurrentTrip = view.findViewById(R.id.GoToTrip);
+        bthShowCurrentTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCurrentTrip();
             }
         });
 
@@ -135,6 +158,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    //Qr Code Scanner
     public void scanCode(){
         ScanOptions options = new ScanOptions();
         options.setPrompt("Кнопку гучності вверх - включити ліхтар \n Кнопку гучності вниз - виключити");
@@ -142,6 +166,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         options.setOrientationLocked(true);
         options.setCaptureActivity(QrCodeScanner.class);
         barLauncer.launch(options);
+    }
+
+    //Go To Curennt Trip
+    public void showCurrentTrip(){
+    //Замінити Фрагмент
+
+        Intent myIntent = new Intent(getActivity(), CurrentTripActivity.class);
+        getActivity().startActivity(myIntent);
+//
+//        FragmentManager fragmentManager = requireParentFragment().getChildFragmentManager(); // Используйте правильный метод получения FragmentManager
+//        FragmentTransaction transaction = fragmentManager.beginTransaction();
+//        transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
+//
+//        //transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
+//        transaction.commit();
+
     }
 
     ActivityResultLauncher<ScanOptions> barLauncer = registerForActivityResult(new ScanContract(),result ->{
@@ -159,6 +199,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         DrawPolygon();
 
         showTransport();
+        TripStarted();
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -170,7 +211,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 return true;
             }
         });
-
     }
 
     private void showBottomSheet(String markerId) {
@@ -182,8 +222,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetDialog.setContentView(R.layout.bottom_sheet_layout);
 
         TextView textView = bottomSheetDialog.findViewById(R.id.textView);
-        Button button1 = bottomSheetDialog.findViewById(R.id.button1);
+        Button button1 = bottomSheetDialog.findViewById(R.id.StartTrip);
         Button button2 = bottomSheetDialog.findViewById(R.id.button2);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
+
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StartTrip();
+                bottomSheetDialog.hide();
+            }
+        });
 
         textView.setText(markerId);
 
@@ -191,6 +241,48 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Используйте markerId для получения информации о маркере
 
         bottomSheetDialog.show();
+    }
+
+    //StartTrip
+
+    private void StartTrip(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("TripStart", true);
+        editor.putString("TripNumber", "123");
+
+        editor.apply();
+
+        Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+
+        TripStarted();
+    }
+
+    private void EndTrip(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("TripStart", false);
+        editor.putString("TripNumber", "");
+
+        editor.apply();
+        Button bthGoToTrip = getActivity().findViewById(R.id.GoToTrip);
+        bthGoToTrip.setVisibility(View.GONE);
+        bthEndTrip.setVisibility(View.GONE);
+    }
+
+    public void TripStarted(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
+        Button bthGoToTrip = getActivity().findViewById(R.id.GoToTrip);
+
+        if (TripStarted) {
+            bthGoToTrip.setVisibility(View.VISIBLE);
+            bthEndTrip.setVisibility(View.VISIBLE);
+        }
+        else{
+            bthGoToTrip.setVisibility(View.GONE);
+            bthEndTrip.setVisibility(View.GONE);
+        }
     }
 
 
@@ -255,5 +347,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public void showTransport(){
         LatLng scooter = new LatLng(49.8926838, 28.5903351);
         mMap.addMarker(new MarkerOptions().position(scooter).title("Вільний самокат").icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter)));
+
+        LatLng scooter1 = new LatLng(49.892613, 28.590552);
+        mMap.addMarker(new MarkerOptions().position(scooter1).title("Вільний самокат").icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter)));
     }
+
 }

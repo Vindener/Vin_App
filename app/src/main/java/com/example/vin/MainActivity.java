@@ -1,5 +1,6 @@
 package com.example.vin;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
 //        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 //        textView.setText(sharedPreferences.getString("email",""));
 
+        ShowProfileiInfo();
     }
 
     @Override
@@ -78,5 +80,12 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public void ShowProfileiInfo(){
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String email_ = sharedPreferences.getString("email","");
+        String phone_ = sharedPreferences.getString("phone","");
+        String name_ = sharedPreferences.getString("name","");
     }
 }

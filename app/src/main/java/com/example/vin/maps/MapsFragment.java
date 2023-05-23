@@ -39,7 +39,6 @@ import com.example.vin.R;
 import com.example.vin.login.LoginActivity;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.trip.CurrentTripActivity;
-import com.example.vin.trip.CurrentTripFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -358,6 +357,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         LatLng scooter1 = new LatLng(49.892613, 28.590552);
         mMap.addMarker(new MarkerOptions().position(scooter1).title("Вільний самокат").icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter)));
+    }
+
+    public void HideTransport(){
+
     }
 
 }

@@ -10,12 +10,7 @@
             android:title="Профіль"
             tools:ignore="DuplicateIds" />
         <item
-            android:id="@+id/nav_current_trip"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Поточна поїздка"
-            tools:ignore="DuplicateIds" />
-        <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_payment"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Поповнення рахунку"
             tools:ignore="DuplicateIds" />

@@ -17,16 +17,16 @@
         tools:layout="@layout/fragment_documentation" />
 
     <fragment
+        android:id="@+id/nav_payment"
+        android:name="com.example.vin.payment.PaymentFragment"
+        android:label="Поповненя рахунку"
+        tools:layout="@layout/fragment_payment" />
+
+    <fragment
         android:id="@+id/nav_list"
         android:name="com.example.vin.list.ListFragment"
         android:label="Історія поїздок"
         tools:layout="@layout/fragment_list" />
-
-    <fragment
-        android:id="@+id/nav_current_trip"
-        android:name="com.example.vin.trip.CurrentTripFragment"
-        android:label="Поточна поїздка"
-        tools:layout="@layout/fragment_current_trip" />
 
     <fragment
         android:id="@+id/nav_logout"

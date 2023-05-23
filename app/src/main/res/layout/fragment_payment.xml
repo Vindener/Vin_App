@@ -38,7 +38,7 @@
         android:layout_gravity="center"
         android:layout_marginBottom="60dp"
         android:ems="10"
-        android:inputType="number"
+        android:inputType="numberDecimal|numberSigned"
         android:minHeight="48dp"
         android:text=""
         tools:ignore="SpeakableTextPresentCheck" />
@@ -78,6 +78,14 @@
         android:layout_marginLeft="280dp"
         android:layout_marginBottom="120dp"
         android:text="100" />
+
+    <ImageView
+        android:id="@+id/pay_qr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|start"
+        android:layout_marginTop="160dp"
+        android:scaleType="fitCenter" />
 
 
 </FrameLayout>

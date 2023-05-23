@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 //        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
 //        textView.setText(sharedPreferences.getString("email",""));
 
-        ShowProfileiInfo();
+
     }
 
     @Override
@@ -82,10 +82,5 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    public void ShowProfileiInfo(){
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        String email_ = sharedPreferences.getString("email","");
-        String phone_ = sharedPreferences.getString("phone","");
-        String name_ = sharedPreferences.getString("name","");
-    }
+
 }

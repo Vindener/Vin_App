@@ -20,6 +20,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +67,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Marker marker;
 
+    final Handler handler = new Handler();
+    final Runnable r = new Runnable() {
+        public void run() {
+            ShowProfileiInfo();
+        }
+    };
+
     static Context context;
 
     public static boolean isLocationEnabled(Context context) {
@@ -79,6 +87,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void DrawPolygon(){
+        if(polygonMap!=null){
+            polygonMap.remove();
+        }
         // Создаем массив с координатами
         LatLng[] coordinates = new LatLng[10];
         coordinates[0] = new LatLng(49.944961, 28.611455);
@@ -109,7 +120,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         // Добавляем полигон на карту
         polygonMap = mMap.addPolygon(polygonOptions);
-
 
     }
 
@@ -161,6 +171,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
 
         context = getContext();
+
+        //Прогрузка інформації користувача
+        handler.postDelayed(r, 100);
+        //ShowProfileiInfo();
 
         return view;
     }
@@ -218,6 +232,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 return true;
             }
         });
+
+
     }
 
     private void showBottomSheet(String markerId) {
@@ -361,6 +377,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     public void HideTransport(){
 
+    }
+
+    public void ShowProfileiInfo(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String phone_ = sharedPreferences.getString("phone","");
+        String name_ = sharedPreferences.getString("name","");
+        Float balance_ = sharedPreferences.getFloat("balance",0);
+
+        TextView name = getActivity().findViewById(R.id.headerName);
+        name.setText(name_);
+
+        TextView phone =  getActivity().findViewById(R.id.headerPhone);
+        phone.setText(phone_);
+
+        TextView balance =  getActivity().findViewById(R.id.BalanceText);
+        balance.setText(balance_.toString());
     }
 
 }

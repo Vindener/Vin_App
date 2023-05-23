@@ -64,6 +64,7 @@ public class CreateNewUserActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("name", name);
         editor.putString("phone", phone);
+        editor.putFloat("balance",0 );
         editor.putBoolean("isFirstRun", false);
         editor.apply();
 

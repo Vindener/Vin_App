@@ -13,9 +13,9 @@
     <string name="header_balance">БАЛАНС:</string>
 
     <!--    user-->
-    <string name="user_name">Vladilav</string>
-    <string name="user_phone">+3809829797</string>
-    <string name="user_wallet">2.40</string>
+    <string name="user_name">User</string>
+    <string name="user_phone"></string>
+    <string name="user_wallet">0.0</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="WriteEmail" />

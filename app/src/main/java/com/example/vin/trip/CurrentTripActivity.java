@@ -7,17 +7,21 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
+import com.example.vin.maps.Transport;
+import com.google.android.gms.maps.model.Marker;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -36,7 +40,9 @@ public class CurrentTripActivity extends AppCompatActivity {
 
     ConstraintLayout startedContainer,notStartedContainer;
     private  TextView timeStartCurrentTrip,costTextView,TripDiructionContainer,TransportNumber;
+    private ImageView CurrentTripImage;
     private  String StartTime;
+    private int selectedTransportType;
 
     private Handler handler;
     private Runnable runnable;
@@ -75,6 +81,12 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         EndTrip = findViewById(R.id.EndTrip);
 
+        selectedTransportType = sharedPreferences.getInt("TransportType",1);
+
+        CurrentTripImage = findViewById(R.id.CurrentTripImage);
+
+        ShowPicture();
+
         EndTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { EndTrip();  }
@@ -109,6 +121,16 @@ public class CurrentTripActivity extends AppCompatActivity {
         // Запустить обновление значения timeDifference
         handler.post(runnable);
 
+    }
+
+    private void ShowPicture() {
+        if (selectedTransportType == 1) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_scooter);
+            CurrentTripImage.setImageDrawable(drawable);
+        } else if (selectedTransportType == 2) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
+            CurrentTripImage.setImageDrawable(drawable);
+        }
     }
 
 

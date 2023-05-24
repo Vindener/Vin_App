@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,8 +69,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Marker selectedMarker; // Выбранный маркер
 
     private String  selectedMarkerTitle = "";
+    private int selectedTransportType = 1;
     private String currentDate= null;
     private Double userBalance = 0.0;
+
 
     private boolean isBottomSheetAllowed = true;
     final Handler handler = new Handler();
@@ -263,6 +266,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
 
+        ImageView bottomSheetImage = bottomSheetDialog.findViewById(R.id.bottomSheetImage);
+
+        for (Transport transport : transports) {
+            if (transport.getTitle().equals(markerId)) {
+                Marker marker = transport.getMarker();
+                if (marker != null) {
+                    if (transport.getType() == 1) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_scooter);
+                        bottomSheetImage.setImageDrawable(drawable);
+                        selectedTransportType = 1;
+                    } else if (transport.getType() == 2) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
+                        bottomSheetImage.setImageDrawable(drawable);
+                        selectedTransportType = 2;
+                    }
+                }
+                break;
+            }
+        }
+
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -283,13 +306,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private void StartTrip(){
         if(userBalance >= 100) {
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("TripStart", true);
-            editor.putString("TransportNumber", selectedMarkerTitle);
-
             selectedMarkerTitle = selectedMarker.getTitle();
+
+            editor.putString("TransportNumber", selectedMarkerTitle);
             editor.putString("selected_marker_title", selectedMarkerTitle);
+
+            editor.putInt("TransportType", selectedTransportType);
 
             GetCurrentDate();
             editor.putString("CurrentDateTrip", currentDate);
@@ -398,7 +423,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     public void ShowTransport() {
         SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
-        String Marker_title = sharedPreferences.getString("selected_marker_title", "");
 
         for (Transport transport : transports) {
             if (transport.isFree()) {

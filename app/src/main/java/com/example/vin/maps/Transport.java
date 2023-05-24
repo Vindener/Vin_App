@@ -8,8 +8,8 @@ public class Transport {
     private double latitude;
     private double longitude;
     private Marker marker;
-
     private int type;
+    private int persec;
 
     public Transport(String title, boolean isFree, double latitude, double longitude,int type) {
         this.title = title;
@@ -17,6 +17,14 @@ public class Transport {
         this.latitude = latitude;
         this.longitude = longitude;
         this.type = type;
+
+        if (type == 1) {
+            persec = 3;
+        } else if (type == 2) {
+            persec = 4;
+        } else {
+            persec = 2;
+        }
     }
 
     public String getTitle() {
@@ -39,16 +47,37 @@ public class Transport {
         return longitude;
     }
 
-    public int getType() {
-        return type;
-    }
-
     public Marker getMarker() {
         return marker;
     }
 
     public void setMarker(Marker marker) {
         this.marker = marker;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+        if (type == 1) {
+            persec = 3;
+        } else if (type == 2) {
+            persec = 4;
+        } else {
+            persec = 0;
+        }
+    }
+
+    public int getPersec(){
+        if (type == 1){
+            return 3;
+        }
+        else if(type == 2){
+            return 4;
+        }
+        return 0;
     }
 }
 

@@ -30,18 +30,18 @@
         android:layout_marginEnd="112dp"
         android:layout_marginBottom="10dp"
         android:text="Перезняти"
-        app:layout_constraintBottom_toTopOf="@+id/bthGoToMap"
+        app:layout_constraintBottom_toTopOf="@+id/bthGoToComplete"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/bthGoToMap"
+        android:id="@+id/bthGoToComplete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="149dp"
         android:layout_marginEnd="102dp"
         android:layout_marginBottom="124dp"
-        android:text="Продовжити"
+        android:text="Відправити"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

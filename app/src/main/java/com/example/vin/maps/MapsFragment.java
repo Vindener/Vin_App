@@ -33,6 +33,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
+import com.example.vin.trip.CameraEndActivity;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,7 +50,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
@@ -57,7 +60,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Polygon polygonMap;
     private Button btnShowCurrentLocation;
     private Button bthQRCodeScanner;
-    private static Button bthEndTrip;
     private static Button bthGoToTrip;
 
     private Button bthShowCurrentTrip;
@@ -66,6 +68,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Marker selectedMarker; // Выбранный маркер
 
     private String  selectedMarkerTitle = "";
+    private String currentDate= null;
 
 
     final Handler handler = new Handler();
@@ -140,14 +143,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) { scanCode();  }
         });
 
-        bthEndTrip =  view.findViewById(R.id.bthEndTrip);
-
         bthGoToTrip =  view.findViewById(R.id.GoToTrip);
 
-        bthEndTrip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) { EndTrip();}
-        });
 
         btnShowCurrentLocation = view.findViewById(R.id.btnShowCurrentLocation);
         btnShowCurrentLocation.setOnClickListener(new View.OnClickListener() {
@@ -283,10 +280,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", true);
-        editor.putString("TripNumber", "123");
+        editor.putString("TransportNumber", selectedMarkerTitle);
 
         selectedMarkerTitle = selectedMarker.getTitle();
         editor.putString("selected_marker_title", selectedMarkerTitle);
+
+        GetCurrentDate();
+        editor.putString("CurrentDateTrip", currentDate);
+
 
         editor.apply();
 
@@ -297,22 +298,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         showMarkerByTitle();
     }
 
-    private void EndTrip(){
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("TripStart", false);
-        editor.putString("TripNumber", "");
-        editor.putString("selected_marker_title", "");
-        selectedMarker= null;
-
-        editor.apply();
-        Button bthGoToTrip = getActivity().findViewById(R.id.GoToTrip);
-        bthGoToTrip.setVisibility(View.GONE);
-        bthEndTrip.setVisibility(View.GONE);
-        HideTransport();
-        ShowTransport();
-    }
-
 
     public static void TripStarted(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
@@ -320,11 +305,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         if (TripStarted) {
             bthGoToTrip.setVisibility(View.VISIBLE);
-            bthEndTrip.setVisibility(View.VISIBLE);
         }
         else{
             bthGoToTrip.setVisibility(View.GONE);
-            bthEndTrip.setVisibility(View.GONE);
         }
     }
 
@@ -466,6 +449,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         TextView balance =  getActivity().findViewById(R.id.BalanceText);
         balance.setText(balance_.toString());
+    }
+
+    private void GetCurrentDate(){
+        // Получаем текущую дату и время
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+        // Форматируем текущую дату и время в строку
+        currentDate = dateFormat.format(calendar.getTime());
     }
 
 

@@ -70,7 +70,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private String  selectedMarkerTitle = "";
     private String currentDate= null;
 
-
+    private boolean isBottomSheetAllowed = true;
     final Handler handler = new Handler();
     final Runnable r = new Runnable() {
         public void run() {
@@ -245,6 +245,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void showBottomSheet(String markerId) {
+        if (!isBottomSheetAllowed) {
+            // Булева переменная указывает, что отображение нижнего диалогового окна запрещено
+            return;
+        }
         // Создание нижнего окна активити
         Context context = requireContext();
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
@@ -295,6 +299,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         HideTransport();
         TripStarted();
+        TripStared_1();
         showMarkerByTitle();
     }
 
@@ -315,6 +320,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
         boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
         selectedMarkerTitle = sharedPreferences.getString("selected_marker_title", "");
+        isBottomSheetAllowed = !TripStarted;
 
         if (TripStarted) {
             ShowTransport();

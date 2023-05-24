@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.vin.LoadActivity;
 import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
@@ -83,6 +84,7 @@ public class CurrentTripActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", false);
         editor.putString("TripNumber", "");
+        editor.putString("selected_marker_title", "");
 
         editor.apply();
 
@@ -90,6 +92,9 @@ public class CurrentTripActivity extends AppCompatActivity {
         ShowContainer();
 
         MapsFragment.TripStarted();
+
+        Intent myIntent = new Intent(CurrentTripActivity.this, CameraEndActivity.class);
+        CurrentTripActivity.this.startActivity(myIntent);
     }
 
     private void ShowContainer(){

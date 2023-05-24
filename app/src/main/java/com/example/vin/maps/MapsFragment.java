@@ -5,9 +5,7 @@ import static android.content.Context.MODE_PRIVATE;
 import androidx.activity.result.ActivityResultLauncher;
 
 import android.Manifest;
-import androidx.fragment.app.FragmentManager;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,12 +30,8 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.vin.LoadActivity;
-import com.example.vin.MainActivity;
 import com.example.vin.R;
-import com.example.vin.login.LoginActivity;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,6 +49,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private Polygon polygonMap;
@@ -65,7 +62,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Button bthShowCurrentTrip;
 
-    private Marker marker;
+    private List<Transport> transports = new ArrayList<>();
+    private Marker selectedMarker; // Выбранный маркер
+
+    private String  selectedMarkerTitle = "";
+
 
     final Handler handler = new Handler();
     final Runnable r = new Runnable() {
@@ -176,6 +177,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         handler.postDelayed(r, 100);
         //ShowProfileiInfo();
 
+        addMarker("11",true,49.8926838, 28.5903351,1);
+        addMarker("12",false,49.892613, 28.590552,2);
+        addMarker("13",false,49.886918, 28.594652,1);
+        addMarker("14",false,49.894497, 28.582444,2);
+        addMarker("15",false,49.894579, 28.582607,1);
+        addMarker("16",false,49.895602, 28.583382,1);
+        addMarker("17",true,49.895748, 28.583480,1);
+
         return view;
     }
 
@@ -219,14 +228,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         DrawPolygon();
 
-        showTransport();
         TripStarted();
+        TripStared_1();
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 // Обработка клика по маркеру
-                String markerId = marker.getId(); // Получение id маркера
+                String markerId = marker.getTitle(); // Получение id маркера
+                selectedMarker = marker;
+
                 // Отображение нижнего окна активити с текстом и кнопками
                 showBottomSheet(markerId);
                 return true;
@@ -274,11 +285,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         editor.putBoolean("TripStart", true);
         editor.putString("TripNumber", "123");
 
+        selectedMarkerTitle = selectedMarker.getTitle();
+        editor.putString("selected_marker_title", selectedMarkerTitle);
+
         editor.apply();
 
         Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
 
+        HideTransport();
         TripStarted();
+        showMarkerByTitle();
     }
 
     private void EndTrip(){
@@ -286,11 +302,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", false);
         editor.putString("TripNumber", "");
+        editor.putString("selected_marker_title", "");
+        selectedMarker= null;
 
         editor.apply();
         Button bthGoToTrip = getActivity().findViewById(R.id.GoToTrip);
         bthGoToTrip.setVisibility(View.GONE);
         bthEndTrip.setVisibility(View.GONE);
+        HideTransport();
+        ShowTransport();
     }
 
 
@@ -305,6 +325,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         else{
             bthGoToTrip.setVisibility(View.GONE);
             bthEndTrip.setVisibility(View.GONE);
+        }
+    }
+
+    public void TripStared_1(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
+        selectedMarkerTitle = sharedPreferences.getString("selected_marker_title", "");
+
+        if (TripStarted) {
+            ShowTransport();
+            HideTransport();
+            showMarkerByTitle();
+        }else{
+            HideTransport();
+            ShowTransport();
         }
     }
 
@@ -367,17 +402,55 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
-    public void showTransport(){
-        LatLng scooter = new LatLng(49.8926838, 28.5903351);
-        mMap.addMarker(new MarkerOptions().position(scooter).title("Вільний самокат").icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter)));
+    public void ShowTransport() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        String Marker_title = sharedPreferences.getString("selected_marker_title", "");
 
-        LatLng scooter1 = new LatLng(49.892613, 28.590552);
-        mMap.addMarker(new MarkerOptions().position(scooter1).title("Вільний самокат").icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter)));
+        for (Transport transport : transports) {
+            if (transport.isFree()) {
+                LatLng position = new LatLng(transport.getLatitude(), transport.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions().position(position).title(transport.getTitle());
+
+                if (transport.getType() == 1) {
+                    markerOptions.icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_scooter));
+                } else if (transport.getType() == 2) {
+                    markerOptions.icon(bitmapDescriptorVector(getActivity(),R.drawable.ic_electric_bike));
+                }
+                Marker marker = mMap.addMarker(markerOptions);
+                transport.setMarker(marker);
+            }
+        }
     }
 
-    public void HideTransport(){
-
+    public void addMarker(String title, boolean isFree, double latitde,double longitude,int type) {
+        Transport transport = new Transport(title, isFree, latitde, longitude,type);
+        transports.add(transport);
     }
+
+    public void HideTransport() {
+        for (Transport transport : transports) {
+            Marker marker = transport.getMarker();
+            if (marker != selectedMarker && marker!= null) {
+                marker.setVisible(false);
+            }
+        }
+    }
+
+    private void showMarkerByTitle() {
+        if (!selectedMarkerTitle.isEmpty()) {
+            for (Transport transport : transports) {
+                if (transport.getTitle().equals(selectedMarkerTitle)) {
+                    Marker marker = transport.getMarker();
+                    if (marker != null) {
+                        marker.setVisible(true);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
 
     public void ShowProfileiInfo(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -394,5 +467,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         TextView balance =  getActivity().findViewById(R.id.BalanceText);
         balance.setText(balance_.toString());
     }
+
 
 }

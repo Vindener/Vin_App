@@ -21,6 +21,7 @@ import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
 import com.example.vin.maps.Transport;
+import com.example.vin.server.Trafic;
 import com.google.android.gms.maps.model.Marker;
 
 import java.text.DecimalFormat;
@@ -173,6 +174,10 @@ public class CurrentTripActivity extends AppCompatActivity {
         return duration;
     }
 
+    //ввести сюди ці значення з серверу
+    private double perces_1 = 4.;
+    private double perces_2 = 3.;
+
     private float calculateCost() {
         // Получить текущую дату и время
         Calendar currentCalendar = Calendar.getInstance();
@@ -195,8 +200,12 @@ public class CurrentTripActivity extends AppCompatActivity {
         // Вычислить количество секунд
         float seconds = timeDifferenceInMillis / 1000;
 
+            //перевірка на тип
+        double addperces = 0.0667;
+        addperces = Trafic.getTrafic(selectedTransportType)/60.;
+
         // Умножить количество секунд на 0.6
-        cost = (float) (seconds * 0.0667);
+        cost = (float) (seconds * addperces);
 
         return cost;
     }

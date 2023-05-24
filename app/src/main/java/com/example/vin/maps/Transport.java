@@ -70,7 +70,7 @@ public class Transport {
         }
     }
 
-    public int getPersec(){
+    public int getPersec(int type){
         if (type == 1){
             return 3;
         }

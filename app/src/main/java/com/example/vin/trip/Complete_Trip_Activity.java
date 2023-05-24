@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
+import com.example.vin.server.Trafic;
 
 public class Complete_Trip_Activity extends AppCompatActivity {
 
@@ -33,8 +34,6 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         EndTripCost = findViewById(R.id.EndTripCost);
         EndDurationTrip = findViewById(R.id.EndDurationTrip);
 
-
-        EndTarifTextView.setText("4.0 ГРН/хв ");
         GetInfo();
         EndTrip();
 
@@ -46,16 +45,27 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         });
     }
 
+    //ввести сюди ці значення з серверу
+    private double perces_1 = 4.;
+    private double perces_2 = 3.;
+
     private void GetInfo() {
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         String costString = sharedPreferences.getString("costTrip", "");
         String duration = sharedPreferences.getString("durationTrip", "");
+        int selectedTransportType = sharedPreferences.getInt("TransportType",1);
 
         EndCost.setText(costString + "грн.");
         EndDuration.setText("* "+duration + "хв.");
         EndTripCost.setText("= "+ costString);
 
         EndDurationTrip.setText(duration + "хв.");
+
+        double perSec = 4;
+
+        perSec = Trafic.getTrafic(selectedTransportType);
+
+        EndTarifTextView.setText(perSec+ " ГРН/хв ");
 
     }
 

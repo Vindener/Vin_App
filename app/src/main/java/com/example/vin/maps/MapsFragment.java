@@ -34,6 +34,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
+import com.example.vin.server.Trafic;
 import com.example.vin.trip.CameraEndActivity;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -261,6 +262,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetDialog.setContentView(R.layout.bottom_sheet_layout);
 
         TextView textView = bottomSheetDialog.findViewById(R.id.textView);
+
+        TextView bottomSheetTrafic = bottomSheetDialog.findViewById(R.id.bottomSheetTrafic);
         Button button1 = bottomSheetDialog.findViewById(R.id.StartTrip);
         Button button2 = bottomSheetDialog.findViewById(R.id.button2);
 
@@ -295,6 +298,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         });
 
         textView.setText(markerId);
+        bottomSheetTrafic.setText(String.valueOf(Trafic.getTrafic(selectedTransportType)));
 
         // Настройка текста и обработчиков кнопок
         // Используйте markerId для получения информации о маркере

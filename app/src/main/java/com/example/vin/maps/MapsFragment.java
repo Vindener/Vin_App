@@ -69,6 +69,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private String  selectedMarkerTitle = "";
     private String currentDate= null;
+    private Double userBalance = 0.0;
 
     private boolean isBottomSheetAllowed = true;
     final Handler handler = new Handler();
@@ -171,13 +172,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         context = getContext();
 
         //Прогрузка інформації користувача
-        handler.postDelayed(r, 100);
+        handler.postDelayed(r, 200);
         //ShowProfileiInfo();
 
         addMarker("11",true,49.8926838, 28.5903351,1);
-        addMarker("12",false,49.892613, 28.590552,2);
+        addMarker("12",true,49.892613, 28.590552,2);
         addMarker("13",false,49.886918, 28.594652,1);
-        addMarker("14",false,49.894497, 28.582444,2);
+        addMarker("14",true,49.894497, 28.582444,2);
         addMarker("15",false,49.894579, 28.582607,1);
         addMarker("16",false,49.895602, 28.583382,1);
         addMarker("17",true,49.895748, 28.583480,1);
@@ -281,28 +282,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     //StartTrip
 
     private void StartTrip(){
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("TripStart", true);
-        editor.putString("TransportNumber", selectedMarkerTitle);
+        if(userBalance >= 100) {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("TripStart", true);
+            editor.putString("TransportNumber", selectedMarkerTitle);
 
-        selectedMarkerTitle = selectedMarker.getTitle();
-        editor.putString("selected_marker_title", selectedMarkerTitle);
+            selectedMarkerTitle = selectedMarker.getTitle();
+            editor.putString("selected_marker_title", selectedMarkerTitle);
 
-        GetCurrentDate();
-        editor.putString("CurrentDateTrip", currentDate);
+            GetCurrentDate();
+            editor.putString("CurrentDateTrip", currentDate);
 
 
-        editor.apply();
+            editor.apply();
 
-        Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
 
-        HideTransport();
-        TripStarted();
-        TripStared_1();
-        showMarkerByTitle();
+            HideTransport();
+            TripStarted();
+            TripStared_1();
+            showMarkerByTitle();
+        }
+        else{
+            Toast.makeText(getActivity(), "Для початку поїздку ви повинні мати як мінімум на балнасі 100 грн!", Toast.LENGTH_SHORT).show();
+        }
     }
-
 
     public static void TripStarted(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
@@ -455,6 +460,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         TextView balance =  getActivity().findViewById(R.id.BalanceText);
         balance.setText(balance_.toString());
+
+        userBalance = Double.parseDouble(String.valueOf(balance_));
     }
 
     private void GetCurrentDate(){
@@ -465,6 +472,5 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         // Форматируем текущую дату и время в строку
         currentDate = dateFormat.format(calendar.getTime());
     }
-
 
 }

@@ -265,7 +265,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         TextView bottomSheetTrafic = bottomSheetDialog.findViewById(R.id.bottomSheetTrafic);
         Button button1 = bottomSheetDialog.findViewById(R.id.StartTrip);
-        Button button2 = bottomSheetDialog.findViewById(R.id.button2);
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
 

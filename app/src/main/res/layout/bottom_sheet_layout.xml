@@ -48,22 +48,10 @@
             android:text="TextView" />
     </LinearLayout>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/StartTrip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="Поїхали" />
 
-        <Button
-            android:id="@+id/StartTrip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Поїхали" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Забронювати" />
-
-    </LinearLayout>
 </LinearLayout>

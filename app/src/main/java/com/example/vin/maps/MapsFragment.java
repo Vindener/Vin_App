@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -56,6 +57,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -73,6 +75,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private int selectedTransportType = 1;
     private String currentDate= null;
     private Double userBalance = 0.0;
+
+
+    private TextView timerBooking;
 
 
     private boolean isBottomSheetAllowed = true;
@@ -187,6 +192,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         addMarker("16",false,49.895602, 28.583382,1);
         addMarker("17",true,49.895748, 28.583480,1);
 
+
+        timerBooking = view.findViewById(R.id.timerBooking);
+
         return view;
     }
 
@@ -202,18 +210,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     //Go To Curennt Trip
     public void showCurrentTrip(){
-    //Замінити Фрагмент
-
         Intent myIntent = new Intent(getActivity(), CurrentTripActivity.class);
         getActivity().startActivity(myIntent);
-//
-//        FragmentManager fragmentManager = requireParentFragment().getChildFragmentManager(); // Используйте правильный метод получения FragmentManager
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//        transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
-//
-//        //transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
-//        transaction.commit();
-
     }
 
     ActivityResultLauncher<ScanOptions> barLauncer = registerForActivityResult(new ScanContract(),result ->{
@@ -296,6 +294,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 bottomSheetDialog.hide();
             }
         });
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TimerGo();
+                Toast.makeText(getActivity(), "Транспорт заброньовано", Toast.LENGTH_SHORT).show();
+
+                selectedMarkerTitle = selectedMarker.getTitle();
+                HideTransport();
+                showMarkerByTitle();
+
+                bottomSheetDialog.hide();
+            }
+        });
 
         textView.setText(markerId);
         bottomSheetTrafic.setText(String.valueOf(Trafic.getTrafic(selectedTransportType)));
@@ -310,6 +321,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private void StartTrip(){
         if(userBalance >= 100) {
+            SharedPreferences sharedPreferences1 = getContext().getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE);
+            boolean timerRunning = sharedPreferences1.getBoolean("timer_running", false);
+            if(timerRunning){
+                SharedPreferences.Editor editor1 = sharedPreferences1.edit();
+                // Сохраняем информацию о завершении таймера
+                editor1.putBoolean("timer_running", false);
+                editor1.apply();
+
+                countDownTimer.cancel();
+                timerBooking.setVisibility(View.GONE);
+            }
+
             SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("TripStart", true);
@@ -353,17 +376,30 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public void TripStared_1(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
         boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
-        selectedMarkerTitle = sharedPreferences.getString("selected_marker_title", "");
+        selectedMarkerTitle = sharedPreferences.getString("TransportNumber", "");
         isBottomSheetAllowed = !TripStarted;
 
-        if (TripStarted) {
+        SharedPreferences sharedPreferences1 = getContext().getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE);
+        boolean timerRunning = sharedPreferences1.getBoolean("timer_running", false);
+
+
+        if(timerRunning){
+            TimerGo();
             ShowTransport();
             HideTransport();
             showMarkerByTitle();
         }else{
-            HideTransport();
-            ShowTransport();
+            if (TripStarted) {
+                ShowTransport();
+                HideTransport();
+                showMarkerByTitle();
+            }else{
+                HideTransport();
+                ShowTransport();
+            }
         }
+
+
     }
 
 
@@ -499,6 +535,59 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         // Форматируем текущую дату и время в строку
         currentDate = dateFormat.format(calendar.getTime());
+    }
+
+    //Timer і бронювання
+    public void TimerGo() {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE);
+        boolean timerRunning = sharedPreferences.getBoolean("timer_running", false);
+
+        if (timerRunning) {
+            long remainingTime = sharedPreferences.getLong("remaining_time", 0);
+            startTimer(remainingTime);
+        } else {
+            // Запуск нового таймера
+            startTimer(5 * 60 * 1000); // 5 минут в миллисекундах
+        }
+    }
+
+    // Объявите CountDownTimer как поле класса
+    private CountDownTimer countDownTimer;
+    private SharedPreferences.Editor editor;
+
+    private void startTimer(long remainingTime) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        // Запускаем таймер
+        countDownTimer = new CountDownTimer(remainingTime, 1000)  {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // Обновляем оставшееся время на таймере в TextView
+                long seconds = millisUntilFinished / 1000;
+                String timeText = String.format(Locale.getDefault(), "%02d:%02d", seconds / 60, seconds % 60);
+                timerBooking.setText(timeText);
+
+                editor.putBoolean("timer_running", true);
+                editor.putLong("remaining_time", millisUntilFinished);
+                editor.apply();
+            }
+
+            @Override
+            public void onFinish() {
+                // Таймер завершен, вызываем метод ShowTransport()
+
+                // Сохраняем информацию о завершении таймера
+                editor.putBoolean("timer_running", false);
+                editor.apply();
+
+                // Скрываем TextView с таймером
+                timerBooking.setVisibility(View.GONE);
+            }
+        }.start();
+
+        // Показываем TextView с таймером
+        timerBooking.setVisibility(View.VISIBLE);
     }
 
 }

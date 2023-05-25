@@ -11,6 +11,8 @@ public class Transport {
     private int type;
     private int persec;
 
+    private int battery;
+
     public Transport(String title, boolean isFree, double latitude, double longitude,int type) {
         this.title = title;
         this.isFree = isFree;

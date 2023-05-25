@@ -1,22 +1,24 @@
 package com.example.vin.server;
-import android.content.Intent;
+
 import android.os.AsyncTask;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class CreateUser extends AsyncTask<String, Void, String> {
-    private static final String SERVER_URL = "http://192.168.0.103:5000/users";
+public class CreateTransport extends AsyncTask<String, Void, String> {
+    private static final String SERVER_URL = "http://192.168.0.103:5000/Transport";
 
     @Override
     protected String doInBackground(String... params) {
-        int kod = 3;
-        String email = params[0];
-        String phone = params[1];
-        String name = params[2];
-        int wallet_id =5;
+        //String index = params[0];
+        String corX = params[0];
+        String corY = params[1];
+        String stanId = params[2];
+        String typeId = params[3];
+        String qrCode = params[4];
         String result = "";
 
         try {
@@ -25,14 +27,15 @@ public class CreateUser extends AsyncTask<String, Void, String> {
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            String parameters = "kod=" + kod + "&email=" + email+ "&phone=" + phone+ "&name=" + name+ "&wallet_id=" + wallet_id;
+            String parameters =  "&corX=" + corX + "&corY=" + corY
+                    + "&stan_id=" + stanId + "&type_id=" + typeId + "&qr_code=" + qrCode;
             DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
             outputStream.writeBytes(parameters);
             outputStream.flush();
             outputStream.close();
 
             int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode == HttpURLConnection.HTTP_CREATED) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String line;
                 StringBuilder response = new StringBuilder();
@@ -56,6 +59,7 @@ public class CreateUser extends AsyncTask<String, Void, String> {
             System.out.println("Не підключилось: " + result);
         }
 
+
         return result;
     }
 
@@ -64,4 +68,8 @@ public class CreateUser extends AsyncTask<String, Void, String> {
         // Обработка результата запроса
         // result содержит ответ от сервера или сообщение об ошибке
     }
+
+
 }
+
+

@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +23,9 @@ public class Complete_Trip_Activity extends AppCompatActivity {
     Button bthGoToMap;
 
     TextView EndCost,EndTarifTextView,EndDuration,EndTripCost,EndDurationTrip;
+    ImageView EndTripImage;
+
+    private int selectedTransportType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +39,10 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         EndTripCost = findViewById(R.id.EndTripCost);
         EndDurationTrip = findViewById(R.id.EndDurationTrip);
 
+        EndTripImage = findViewById(R.id.EndTripImage);
+
         GetInfo();
+        ShowPicture();
         EndTrip();
 
         bthGoToMap.setOnClickListener(new View.OnClickListener() {
@@ -45,15 +53,10 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         });
     }
 
-    //ввести сюди ці значення з серверу
-    private double perces_1 = 4.;
-    private double perces_2 = 3.;
-
     private void GetInfo() {
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         String costString = sharedPreferences.getString("costTrip", "");
         String duration = sharedPreferences.getString("durationTrip", "");
-        int selectedTransportType = sharedPreferences.getInt("TransportType",1);
 
         EndCost.setText(costString + "грн.");
         EndDuration.setText("* "+duration + "хв.");
@@ -67,6 +70,8 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         EndTarifTextView.setText(perSec+ " ГРН/хв ");
 
+        selectedTransportType = sharedPreferences.getInt("TransportType",1);
+
     }
 
     private void EndTrip(){
@@ -75,6 +80,8 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         String costString = sharedPreferences.getString("costTrip", "");
+
+        costString = costString.replace(",", ".");
 
         Double cost = Double.parseDouble(costString);
         Double userBalance = Double.parseDouble(String.valueOf(balance_));
@@ -101,6 +108,16 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         editor.apply();
 
         MapsFragment.TripStarted();
+    }
+
+    private void ShowPicture() {
+        if (selectedTransportType == 1) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_scooter);
+            EndTripImage.setImageDrawable(drawable);
+        } else if (selectedTransportType == 2) {
+            Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
+            EndTripImage.setImageDrawable(drawable);
+        }
     }
 
     private void GoToMap(){

@@ -77,7 +77,7 @@ public class Transport {
         else if(type == 2){
             return 4;
         }
-        return 0;
+        return persec;
     }
 }
 

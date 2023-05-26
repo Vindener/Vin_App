@@ -179,13 +179,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         handler.postDelayed(r, 200);
         //ShowProfileiInfo();
 
-        addMarker("11",true,49.8926838, 28.5903351,1);
-        addMarker("12",true,49.892613, 28.590552,2);
-        addMarker("13",false,49.886918, 28.594652,1);
-        addMarker("14",true,49.894497, 28.582444,2);
-        addMarker("15",false,49.894579, 28.582607,1);
-        addMarker("16",false,49.895602, 28.583382,1);
-        addMarker("17",true,49.895748, 28.583480,1);
+        addMarker("11",true,49.8926838, 28.5903351,1,50);
+        addMarker("12",true,49.892613, 28.590552,2,30);
+        addMarker("13",false,49.886918, 28.594652,1,40);
+        addMarker("14",true,49.894497, 28.582444,2,50);
+        addMarker("15",false,49.894579, 28.582607,1,70);
+        addMarker("16",false,49.895602, 28.583382,1,80);
+        addMarker("17",true,49.895748, 28.583480,1,100);
 
         return view;
     }
@@ -266,9 +266,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         TextView bottomSheetTrafic = bottomSheetDialog.findViewById(R.id.bottomSheetTrafic);
         Button button1 = bottomSheetDialog.findViewById(R.id.StartTrip);
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        TextView batteryLevel = bottomSheetDialog.findViewById(R.id.batteryLevel);
+        ImageView batteryImage = bottomSheetDialog.findViewById(R.id.baterryImage);
 
         ImageView bottomSheetImage = bottomSheetDialog.findViewById(R.id.bottomSheetImage);
+        int batteryValueLevel;
 
         for (Transport transport : transports) {
             if (transport.getTitle().equals(markerId)) {
@@ -283,6 +285,41 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         bottomSheetImage.setImageDrawable(drawable);
                         selectedTransportType = 2;
                     }
+                    batteryValueLevel = transport.getBatteryLevel();
+                    batteryLevel.setText(String.valueOf(batteryValueLevel)+"%");
+                    if(batteryValueLevel == 100){
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_full);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }else if(batteryValueLevel > 70){
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_6_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }else if (batteryValueLevel >50) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_5_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }else if (batteryValueLevel >40) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_4_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }
+                    else if (batteryValueLevel >25) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_3_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }
+                    else if (batteryValueLevel >10) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_2_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }
+                    else if (batteryValueLevel >10) {
+                        Drawable drawable = getResources().getDrawable(R.drawable.battery_1_bar);
+                        batteryImage.setImageDrawable(drawable);
+                        break;
+                    }
+
                 }
                 break;
             }
@@ -443,8 +480,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void addMarker(String title, boolean isFree, double latitde,double longitude,int type) {
-        Transport transport = new Transport(title, isFree, latitde, longitude,type);
+    public void addMarker(String title, boolean isFree, double latitde,double longitude,int type, int battery) {
+        Transport transport = new Transport(title, isFree, latitde, longitude,type,battery);
         transports.add(transport);
     }
 

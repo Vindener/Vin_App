@@ -10,13 +10,15 @@ public class Transport {
     private Marker marker;
     private int type;
     private int persec;
+    private int battery;
 
-    public Transport(String title, boolean isFree, double latitude, double longitude,int type) {
+    public Transport(String title, boolean isFree, double latitude, double longitude,int type,int battery) {
         this.title = title;
         this.isFree = isFree;
         this.latitude = latitude;
         this.longitude = longitude;
         this.type = type;
+        this.battery = battery;
 
         if (type == 1) {
             persec = 3;
@@ -78,6 +80,13 @@ public class Transport {
             return 4;
         }
         return persec;
+    }
+
+    public int getBatteryLevel(){
+        return battery;
+    }
+    public void setBatteryLevel(int battery){
+        this.battery = battery;
     }
 }
 

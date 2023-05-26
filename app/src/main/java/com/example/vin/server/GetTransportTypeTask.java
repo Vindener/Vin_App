@@ -11,14 +11,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GetTransportTypeTask extends AsyncTask<Void, Void, Trafic> {
+public class GetTransportTypeTask extends AsyncTask<Void, Void,  List<Trafic>> {
 
-    private static final String API_URL = "http://192.168.0.11:5000/getTransportType";
-
+    String API_URL = ApiConstants.API_URL+"typetransport";
     @Override
-    protected Trafic doInBackground(Void... voids) {
-        Trafic trafic = null;
+    protected List<Trafic> doInBackground(Void... voids) {
+        List<Trafic> traficList = new ArrayList<>();
         try {
             URL url = new URL(API_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -35,34 +36,41 @@ public class GetTransportTypeTask extends AsyncTask<Void, Void, Trafic> {
                 }
                 reader.close();
 
-                // Разберите полученный JSON-ответ и создайте объект Trafic
+                // Разберите полученный JSON-ответ и создайте объекты Trafic
                 JSONArray jsonArray = new JSONArray(response.toString());
-                JSONObject typeTransportData = jsonArray.getJSONObject(0); // Первый объект в массиве
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject typeTransportData = jsonArray.getJSONObject(i);
 
-                String typeName = typeTransportData.getString("type_transport_name");
-                double priceOf1 = typeTransportData.getDouble("price_of_1");
+                    String typeName = typeTransportData.getString("type_transport_name");
+                    double priceOf1 = typeTransportData.getDouble("price_of_1");
 
-                trafic = new Trafic();
-                trafic.setTypeName(typeName);
-                trafic.setPriceOf1(priceOf1);
+                    Trafic trafic = new Trafic();
+                    trafic.setTypeName(typeName);
+                    trafic.setPriceOf1(priceOf1);
+
+                    traficList.add(trafic);
+                }
             }
 
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
+            Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
         }
 
-        return trafic;
+        return traficList;
     }
 
     @Override
-    protected void onPostExecute(Trafic trafic) {
-        if (trafic != null) {
-            // Вывод информации о полученных данных объекта Trafic
-            Log.d("TransportTypeInfo", "Type Name: " + trafic.getTypeName());
-            Log.d("TransportTypeInfo", "Price of 1: " + String.valueOf(trafic.getPriceOf1()));
+    protected void onPostExecute(List<Trafic> traficList) {
+        if (traficList != null && !traficList.isEmpty()) {
+            // Используйте данные объектов Trafic в активити
+//            for (Trafic trafic : traficList) {
+//                Log.d("TransportTypeInfo", "Type Name: " + trafic.getTypeName());
+//                Log.d("TransportTypeInfo", "Price of 1: " + trafic.getPriceOf1());
+//            }
 
-            // Другие операции с данными объекта Trafic...
+            // Другие операции с данными объектов Trafic...
         } else {
             Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
         }

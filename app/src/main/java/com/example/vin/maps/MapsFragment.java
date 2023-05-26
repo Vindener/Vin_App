@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -202,6 +203,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         addMarker("16",false,49.895602, 28.583382,1);
         addMarker("17",true,49.895748, 28.583480,1);
 
+        WorkServer();
+
         return view;
     }
 
@@ -286,6 +289,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         ImageView bottomSheetImage = bottomSheetDialog.findViewById(R.id.bottomSheetImage);
 
+        double traficPrice = 3.;
+
         for (Transport transport : transports) {
             if (transport.getTitle().equals(markerId)) {
                 Marker marker = transport.getMarker();
@@ -293,11 +298,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     if (transport.getType() == 1) {
                         Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_scooter);
                         bottomSheetImage.setImageDrawable(drawable);
-                        selectedTransportType = 1;
+                        Trafic firstTrafic = traficList.get(0);
+                        traficPrice = firstTrafic.getPriceOf1();
                     } else if (transport.getType() == 2) {
                         Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
                         bottomSheetImage.setImageDrawable(drawable);
-                        selectedTransportType = 2;
+                        Trafic firstTrafic = traficList.get(1);
+                        traficPrice = firstTrafic.getPriceOf1();
                     }
                 }
                 break;
@@ -313,7 +320,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         });
 
         textView.setText(markerId);
-        bottomSheetTrafic.setText(String.valueOf(Trafic.getTrafic(selectedTransportType)));
+        bottomSheetTrafic.setText(String.valueOf(traficPrice));
 
         // Настройка текста и обработчиков кнопок
         // Используйте markerId для получения информации о маркере
@@ -517,6 +524,53 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
+    // Добавьте поле для списка объектов Trafic
+    private List<Trafic> traficList;
+
+    private void WorkServer(){
+        fetchTransportData();
+    }
+
+    // Создайте метод для выполнения запроса и получения данных
+    private void fetchTransportData() {
+        GetTransportTypeTask task = new GetTransportTypeTask() {
+            @Override
+            protected void onPostExecute(List<Trafic> result) {
+                // Получите данные и обновите список объектов Trafic
+                traficList = result;
+
+                // Обновите пользовательский интерфейс вашего фрагмента с использованием полученных данных
+                //updateUI();
+            }
+        };
+        task.execute();
+    }
+
+    // Метод для обновления пользовательского интерфейса фрагмента с использованием полученных данных
+    private void updateUI() {
+        if (traficList != null && !traficList.isEmpty()) {
+            // Используйте данные объектов Trafic для обновления пользовательского интерфейса
+            Toast.makeText(getActivity(), "Go2! ", Toast.LENGTH_SHORT).show();
+            // Пример: Вывод данных в Log
+            for (Trafic trafic : traficList) {
+                Log.d("TransportTypeInfo", "1Type Name: " + trafic.getTypeName());
+                Log.d("TransportTypeInfo", "2Price of 1: " + trafic.getPriceOf1());
+            }
+
+            // Пример: Обновление TextView с данными объектов Trafic
+//            TextView typeNameTextView = getView().findViewById(R.id.typeNameTextView);
+
+            // Предполагая, что у вас есть соответствующие TextView в макете фрагмента
+            Trafic firstTrafic = traficList.get(0);
+//            typeNameTextView.setText(firstTrafic.getTypeName());
+//            priceOf1TextView.setText(String.valueOf(firstTrafic.getPriceOf1()));
+
+            // Другие операции с данными объектов Trafic и обновление интерфейса...
+        } else {
+            Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
+        }
+    }
+
     public void test(){
 
         Toast.makeText(getActivity(), "Go! ", Toast.LENGTH_SHORT).show();
@@ -525,8 +579,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 //            CreateTransport task = new CreateTransport();
 //            task.execute("10.0", "20.0", "1", "2", "ABC123");
 
-        GetTransportTypeTask task = new GetTransportTypeTask();
-        task.execute();
+        fetchTransportData();
     }
 
 }

@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
+import com.example.vin.addition.LocationDialogFragment;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.Trafic;
 import com.example.vin.trip.CameraEndActivity;
@@ -95,6 +96,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         context.startActivity(intent);
     }
 
+    public void LocationDialog(){
+        boolean isLocationEnabled = isLocationEnabled(requireContext());
+        if (!isLocationEnabled) {
+            LocationDialogFragment dialogFragment = LocationDialogFragment.newInstance();
+            dialogFragment.show(getFragmentManager(), "ConfirmationDialogFragment");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        boolean isLocationEnabled = isLocationEnabled(requireContext());
+        if (!isLocationEnabled) {
+            LocationDialogFragment dialogFragment = LocationDialogFragment.newInstance();
+            dialogFragment.show(getFragmentManager(), "ConfirmationDialogFragment");
+        }
+    }
+
     public void DrawPolygon(){
         if(polygonMap!=null){
             polygonMap.remove();
@@ -136,11 +156,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        if (isLocationEnabled(requireActivity())) {
-            // Местоположение включено
-        } else {
-            openLocationSettings(requireActivity());
-        }
+        //LocationDialog();
+//        if (isLocationEnabled(requireActivity())) {
+//            // Местоположение включено
+//        } else {
+//            openLocationSettings(requireActivity());
+//        }
 
         bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
         bthQRCodeScanner.setOnClickListener(new View.OnClickListener() {

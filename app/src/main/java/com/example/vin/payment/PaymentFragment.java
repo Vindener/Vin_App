@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +39,28 @@ public class PaymentFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_payment, container, false);
 
         payCount = view.findViewById(R.id.payCountText);
+        payCount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Не используется
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Не используется
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString();
+                int decimalIndex = text.indexOf(".");
+
+                if (decimalIndex != -1 && text.length() - decimalIndex - 1 > 2) {
+                    // Удаляем лишние символы после десятичной точки
+                    s.delete(decimalIndex + 3, s.length());
+                }
+            }
+        });
 
         pay30 = view.findViewById(R.id.pay30);
         pay50 = view.findViewById(R.id.pay50);

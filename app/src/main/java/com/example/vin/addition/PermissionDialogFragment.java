@@ -86,11 +86,4 @@ public class PermissionDialogFragment extends DialogFragment {
         // Ничего не делаем при нажатии на кнопку "Назад"
         getActivity().finishAffinity();
     }
-
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        // Ничего не делаем при закрытии диалога
-        getActivity().finishAffinity();
-    }
-
 }

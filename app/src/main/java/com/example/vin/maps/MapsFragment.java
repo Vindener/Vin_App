@@ -6,7 +6,9 @@ import androidx.activity.result.ActivityResultLauncher;
 
 import android.Manifest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -53,10 +55,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -74,7 +79,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private int selectedTransportType = 1;
     private String currentDate= null;
     private Double userBalance = 0.0;
-
 
     private boolean isBottomSheetAllowed = true;
     final Handler handler = new Handler();
@@ -97,6 +101,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         super.onResume();
         //Перевірка на доступність місцеположення
         CheckPermissions();
+        CheckBalance();
     }
 
 
@@ -115,8 +120,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             PermissionDialogFragment dialogFragment = PermissionDialogFragment.newInstance(message);
             dialogFragment.show(getFragmentManager(), "ConfirmationDialogFragment");
         }
-
     }
+
+    private void CheckBalance(){
+        if(userBalance<0.){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            // Замените "value" на значение вашей переменной
+            String value = "У вас існує заборговоність в сумі "+String.valueOf(userBalance)+". Поповніть свій баланс!";
+
+            builder.setMessage(value);
+
+            builder.setPositiveButton("Добре", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Закрытие диалогового окна
+                    dialog.dismiss();
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
 
     public void DrawPolygon(){
         if(polygonMap!=null){
@@ -198,7 +224,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         addMarker("11",true,49.8926838, 28.5903351,1,50);
         addMarker("12",true,49.892613, 28.590552,2,30);
-        addMarker("13",false,49.886918, 28.594652,1,40);
+        addMarker("1",false,49.886918, 28.594652,1,40);
         addMarker("14",true,49.894497, 28.582444,2,50);
         addMarker("15",false,49.894579, 28.582607,1,70);
         addMarker("16",false,49.895602, 28.583382,1,80);
@@ -235,7 +261,34 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     ActivityResultLauncher<ScanOptions> barLauncer = registerForActivityResult(new ScanContract(),result ->{
         if(result.getContents() != null){
-            Toast.makeText(getActivity(), "Result: "+ result.getContents(), Toast.LENGTH_SHORT).show();
+            String resultQr = result.getContents();
+
+            Pattern pattern = Pattern.compile("<vinmetz>(\\d+)<vinmetz>");
+            Matcher matcher = pattern.matcher(resultQr);
+
+            boolean found = false;
+
+            if (matcher.find()) {
+                String value = matcher.group(1); // Получаем значення
+                for (Transport transport : transports) {
+                    if (transport.getTitle().equals(value) && transport.isFree()) {
+                        Marker marker = transport.getMarker();
+                        if (marker != null) {
+                            selectedMarkerTitle = value;
+                            selectedMarker = marker;
+                            showBottomSheet(value);
+                        }
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    Toast.makeText(getActivity(), "Цей транспорт вже зайнято!", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getActivity(), "Ви просканували не те!", Toast.LENGTH_SHORT).show();
+            }
+
         }
     });
 
@@ -336,7 +389,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         batteryImage.setImageDrawable(drawable);
                         break;
                     }
-
                 }
                 break;
             }
@@ -345,7 +397,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StartTrip();
+                ShowDialogBeforeStart();
                 bottomSheetDialog.hide();
             }
         });
@@ -359,36 +411,61 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         bottomSheetDialog.show();
     }
 
-    //StartTrip
-
-    private void StartTrip(){
+    private void ShowDialogBeforeStart(){
         if(userBalance >= 100) {
-            SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("TripStart", true);
-            selectedMarkerTitle = selectedMarker.getTitle();
+            // Создание диалогового окна
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Перевірте, чи все добре з транспортом. ");
+            // Установка кнопки "все, хорошо"
+            builder.setPositiveButton("Так все, добре.", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Выполнение вашей функции myFunc
+                    StartTrip();
+                }
+            });
+            // Установка кнопки "отмена"
+            builder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Закрытие диалогового окна
+                    dialog.dismiss();
+                }
+            });
 
-            editor.putString("TransportNumber", selectedMarkerTitle);
-            editor.putString("selected_marker_title", selectedMarkerTitle);
-
-            editor.putInt("TransportType", selectedTransportType);
-
-            GetCurrentDate();
-            editor.putString("CurrentDateTrip", currentDate);
-
-
-            editor.apply();
-
-            Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
-
-            HideTransport();
-            TripStarted();
-            TripStared_1();
-            showMarkerByTitle();
+        // Создание и отображение диалогового окна
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
         else{
             Toast.makeText(getActivity(), "Для початку поїздку ви повинні мати як мінімум на балнасі 100 грн!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    //StartTrip
+
+    private void StartTrip(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("TripStart", true);
+        selectedMarkerTitle = selectedMarker.getTitle();
+
+        editor.putString("TransportNumber", selectedMarkerTitle);
+        editor.putString("selected_marker_title", selectedMarkerTitle);
+
+        editor.putInt("TransportType", selectedTransportType);
+
+        GetCurrentDate();
+        editor.putString("CurrentDateTrip", currentDate);
+
+        editor.apply();
+
+        Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+
+        HideTransport();
+        TripStarted();
+        TripStared_1();
+        showMarkerByTitle();
     }
 
     public static void TripStarted(){
@@ -526,7 +603,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
     public void ShowProfileiInfo(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String phone_ = sharedPreferences.getString("phone","");
@@ -539,10 +615,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         TextView phone =  getActivity().findViewById(R.id.headerPhone);
         phone.setText(phone_);
 
-        TextView balance =  getActivity().findViewById(R.id.BalanceText);
-        balance.setText(balance_.toString());
-
         userBalance = Double.parseDouble(String.valueOf(balance_));
+
+        TextView balance =  getActivity().findViewById(R.id.BalanceText);
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        String formattedBalance = decimalFormat.format(userBalance);
+        balance.setText(formattedBalance.toString());
     }
 
     private void GetCurrentDate(){

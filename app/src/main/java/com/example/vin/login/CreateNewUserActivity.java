@@ -6,6 +6,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,28 @@ public class CreateNewUserActivity extends AppCompatActivity {
         bth_CreateNewUser = findViewById(R.id.bth_CreateNewUser);
         EditText editText1 = findViewById(R.id.RegisterUserNameTextView);
         EditText editText2 = findViewById(R.id.RegisterPhoneTextView);
+
+        editText2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Не используется
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Не используется
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = s.toString();
+
+                if (!text.startsWith("380")) {
+                    // Удаление символов, не соответствующих требуемому началу "380"
+                    s.replace(0, s.length(), "380");
+                }
+            }
+        });
         bth_CreateNewUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,7 +71,7 @@ public class CreateNewUserActivity extends AppCompatActivity {
                 else if (phone.length() == 0) {
                     Toast.makeText(CreateNewUserActivity.this, "Помилка: поле телефону пусте!", Toast.LENGTH_SHORT).show();
                 }
-                else if (phone.length() < 10) {
+                else if (phone.length() < 12) {
                     Toast.makeText(CreateNewUserActivity.this, "Помилка: Ви ввели короткий номер телефону!", Toast.LENGTH_SHORT).show();
                 }
                 else{
@@ -56,7 +80,6 @@ public class CreateNewUserActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public void CreateUser(){

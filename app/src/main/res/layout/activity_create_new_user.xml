@@ -69,8 +69,10 @@
         android:ems="10"
         android:inputType="phone"
         android:hint="Номер телефону"
+        android:maxLength="12"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

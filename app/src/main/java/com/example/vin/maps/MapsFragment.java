@@ -36,6 +36,7 @@ import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.CreateTransport;
 import com.example.vin.server.GetTransportDataTask;
+import com.example.vin.server.GetTransportTypeTask;
 import com.example.vin.server.Trafic;
 import com.example.vin.trip.CameraEndActivity;
 import com.example.vin.trip.CurrentTripActivity;
@@ -524,35 +525,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 //            CreateTransport task = new CreateTransport();
 //            task.execute("10.0", "20.0", "1", "2", "ABC123");
 
-        GetTransportDataTask task = new GetTransportDataTask();
+        GetTransportTypeTask task = new GetTransportTypeTask();
         task.execute();
-
-// Дождитесь выполнения задачи AsyncTask и затем сохраните полученные данные в массиве
-        List<String> transportDataList = new ArrayList<>();
-        transportDataList.add(task.transport_index);
-        transportDataList.add(task.corX);
-        transportDataList.add(task.corY);
-        transportDataList.add(task.stanId);
-        transportDataList.add(task.typeId);
-        transportDataList.add(task.qrCode);
-
-// Преобразуйте список в массив строк
-        String[] transportDataArray = transportDataList.toArray(new String[transportDataList.size()]);
-
-// Используйте массив данных в вашем коде
-// Например, доступ к элементам массива:
-        String myIndex = transportDataArray[0];
-        String myCorX = transportDataArray[1];
-        String myCorY = transportDataArray[2];
-// ...
-
-// Далее вы можете работать с массивом transportDataArray по индексам
-// Например, выведите все значения массива в консоль
-        for (String value : transportDataArray) {
-            System.out.println(transportDataArray[0]);
-        }
-        Toast.makeText(getActivity(), "Yes! " , Toast.LENGTH_SHORT).show();
-        System.out.println("Не: " );
     }
 
 }

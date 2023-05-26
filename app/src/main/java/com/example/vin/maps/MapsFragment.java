@@ -17,9 +17,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +34,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
-import com.example.vin.addition.LocationDialogFragment;
+import com.example.vin.addition.PermissionDialogFragment;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.Trafic;
-import com.example.vin.trip.CameraEndActivity;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -86,33 +86,36 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     static Context context;
 
+    //Location
     public static boolean isLocationEnabled(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    public static void openLocationSettings(Context context) {
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        context.startActivity(intent);
-    }
-
-    public void LocationDialog(){
-        boolean isLocationEnabled = isLocationEnabled(requireContext());
-        if (!isLocationEnabled) {
-            LocationDialogFragment dialogFragment = LocationDialogFragment.newInstance();
-            dialogFragment.show(getFragmentManager(), "ConfirmationDialogFragment");
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
+        //Перевірка на доступність місцеположення
+        CheckPermissions();
+    }
 
+
+    //Internet
+    private boolean isInternetAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+    private void CheckPermissions(){
+        boolean isInternetEnabled = isInternetAvailable();
         boolean isLocationEnabled = isLocationEnabled(requireContext());
-        if (!isLocationEnabled) {
-            LocationDialogFragment dialogFragment = LocationDialogFragment.newInstance();
+
+        if (!isInternetEnabled || !isLocationEnabled) {
+            String message = !isInternetEnabled ? "Интернет недоступен" : "Местоположение не включено";
+            PermissionDialogFragment dialogFragment = PermissionDialogFragment.newInstance(message);
             dialogFragment.show(getFragmentManager(), "ConfirmationDialogFragment");
         }
+
     }
 
     public void DrawPolygon(){
@@ -155,13 +158,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
-
-        //LocationDialog();
-//        if (isLocationEnabled(requireActivity())) {
-//            // Местоположение включено
-//        } else {
-//            openLocationSettings(requireActivity());
-//        }
 
         bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
         bthQRCodeScanner.setOnClickListener(new View.OnClickListener() {

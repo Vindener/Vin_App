@@ -35,7 +35,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
+import com.example.vin.server.City;
 import com.example.vin.server.CreateTransport;
+import com.example.vin.server.GetCityDataTask;
 import com.example.vin.server.GetTransportDataTask;
 import com.example.vin.server.GetTransportTypeTask;
 import com.example.vin.server.Trafic;
@@ -58,6 +60,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -107,42 +110,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         if(polygonMap!=null){
             polygonMap.remove();
         }
-        // Создаем массив с координатами
-        LatLng[] coordinates = new LatLng[10];
-        coordinates[0] = new LatLng(49.944961, 28.611455);
-        coordinates[1] = new LatLng(49.939776, 28.617922);
-        coordinates[2] = new LatLng(49.930024, 28.627584);
-        coordinates[3] = new LatLng(49.900735, 28.632276);
-        coordinates[4] = new LatLng(49.860025, 28.615820);
-        coordinates[5] = new LatLng(49.873121, 28.568991);
-        coordinates[6] = new LatLng(49.876661, 28.554013);
-        coordinates[7] = new LatLng(49.907011, 28.556739);
-        coordinates[8] = new LatLng(49.933163, 28.586319);
-        coordinates[9] = new LatLng(49.942839, 28.603362);
+            for (City city : cityList) {
 
-        // Создаем объект PolygonOptions
-        PolygonOptions polygonOptions = new PolygonOptions();
-        polygonOptions.strokeWidth(5);
-        polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
-        polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
+                double[] coordinates = city.getCoordinates();
 
-        // Добавляем координаты в PolygonOptions
-        for (LatLng coordinate : coordinates) {
-            polygonOptions.add(coordinate);
-        }
+                // Создаем объект PolygonOptions для текущего объекта City
+                PolygonOptions polygonOptions = new PolygonOptions();
+                polygonOptions.strokeWidth(5);
+                polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
+                polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
 
-        //Клікабельність але поки не розібрався
-        //polygonOptions.clickable(true);
+                // Добавляем координаты в PolygonOptions
+                for (int i = 0; i < coordinates.length; i += 2) {
+                    double latitude = coordinates[i];
+                    double longitude = coordinates[i + 1];
+                    LatLng coordinate = new LatLng(latitude, longitude);
+                    polygonOptions.add(coordinate);
+                }
 
+                // Добавляем полигон на карту
+                mMap.addPolygon(polygonOptions);
+                }
 
-        // Добавляем полигон на карту
-        polygonMap = mMap.addPolygon(polygonOptions);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        WorkServer();
 
         if (isLocationEnabled(requireActivity())) {
             // Местоположение включено
@@ -203,8 +199,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         addMarker("16",false,49.895602, 28.583382,1);
         addMarker("17",true,49.895748, 28.583480,1);
 
-        WorkServer();
-
         return view;
     }
 
@@ -245,8 +239,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         showCurrentLocation();
-
-        DrawPolygon();
 
         TripStarted();
         TripStared_1();
@@ -527,7 +519,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     // Добавьте поле для списка объектов Trafic
     private List<Trafic> traficList;
 
+    //Міста
+    private List<City> cityList;
+
     private void WorkServer(){
+        fetchCityData();
         fetchTransportData();
     }
 
@@ -541,6 +537,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                 // Обновите пользовательский интерфейс вашего фрагмента с использованием полученных данных
                 //updateUI();
+            }
+        };
+        task.execute();
+    }
+
+    // Создайте метод для выполнения запроса и получения данных
+    private void fetchCityData() {
+        GetCityDataTask task = new GetCityDataTask(getContext()) {
+            @Override
+            protected void onPostExecute(List<City> result) {
+                // Получите данные и обновите список объектов City
+                cityList = result;
+
+                // Обновите пользовательский интерфейс вашего фрагмента или активности с использованием полученных данных
+                updateUI();
+                DrawPolygon();
             }
         };
         task.execute();
@@ -569,6 +581,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         } else {
             Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
         }
+
+
+        // Проверка, есть ли данные для отображения
+        if (cityList != null && !cityList.isEmpty()) {
+            Toast.makeText(getActivity(), "Go3! ", Toast.LENGTH_SHORT).show();
+            // Вывод данных
+            for (City city : cityList) {
+                String cityName = city.getCityName();
+                double[] coordinates = city.getCoordinates();
+
+                // Вывод данных в лог
+                Log.d("City", "City Name: " + cityName);
+                Log.d("City", "Coordinates: " + Arrays.toString(coordinates));
+
+                // Другие операции с данными, например, обновление пользовательского интерфейса
+                // ...
+            }
+        } else {
+            // Данные не найдены или пустой список
+            Log.d("City", "No data available.");
+        }
     }
 
     public void test(){
@@ -579,7 +612,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 //            CreateTransport task = new CreateTransport();
 //            task.execute("10.0", "20.0", "1", "2", "ABC123");
 
-        fetchTransportData();
+     //   fetchTransportData();
+        fetchCityData();
+
+
     }
 
 }

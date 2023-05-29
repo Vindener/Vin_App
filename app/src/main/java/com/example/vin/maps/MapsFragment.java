@@ -36,12 +36,10 @@ import androidx.fragment.app.Fragment;
 import com.example.vin.R;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.City;
-import com.example.vin.server.CreateTransport;
 import com.example.vin.server.GetCityDataTask;
 import com.example.vin.server.GetTransportDataTask;
 import com.example.vin.server.GetTransportTypeTask;
 import com.example.vin.server.Trafic;
-import com.example.vin.trip.CameraEndActivity;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -77,7 +75,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Button bthShowCurrentTrip;
 
-    private List<Transport> transports = new ArrayList<>();
+
     private Marker selectedMarker; // Выбранный маркер
 
     private String  selectedMarkerTitle = "";
@@ -191,13 +189,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         handler.postDelayed(r, 200);
         //ShowProfileiInfo();
 
-        addMarker("11",true,49.8926838, 28.5903351,1);
-        addMarker("12",true,49.892613, 28.590552,2);
-        addMarker("13",false,49.886918, 28.594652,1);
-        addMarker("14",true,49.894497, 28.582444,2);
-        addMarker("15",false,49.894579, 28.582607,1);
-        addMarker("16",false,49.895602, 28.583382,1);
-        addMarker("17",true,49.895748, 28.583480,1);
+//        addMarker("11",true,49.8926838, 28.5903351,1);
+//        addMarker("12",true,49.892613, 28.590552,2);
+//        addMarker("13",false,49.886918, 28.594652,1);
+//        addMarker("14",true,49.894497, 28.582444,2);
+//        addMarker("15",false,49.894579, 28.582607,1);
+//        addMarker("16",false,49.895602, 28.583382,1);
+//        addMarker("17",true,49.895748, 28.583480,1);
 
         return view;
     }
@@ -459,7 +457,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void addMarker(String title, boolean isFree, double latitde,double longitude,int type) {
-        Transport transport = new Transport(title, isFree, latitde, longitude,type);
+        Transport transport = new Transport(title, isFree, latitde, longitude,type,0);
         transports.add(transport);
     }
 
@@ -521,14 +519,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     //Міста
     private List<City> cityList;
+    //Transport
+    private List<Transport> transports = new ArrayList<>();
 
     private void WorkServer(){
         fetchCityData();
+        fetchTypeData();
         fetchTransportData();
     }
 
     // Создайте метод для выполнения запроса и получения данных
-    private void fetchTransportData() {
+    private void fetchTypeData() {
         GetTransportTypeTask task = new GetTransportTypeTask() {
             @Override
             protected void onPostExecute(List<Trafic> result) {
@@ -541,6 +542,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         };
         task.execute();
     }
+
+    private void fetchTransportData() {
+        GetTransportDataTask task = new GetTransportDataTask(context) {
+            @Override
+            protected void onPostExecute(List<Transport> result) {
+                // Получите данные и сохраните список транспортов в переменную transports
+                transports = result;
+
+                // Здесь вы можете выполнять нужные вам действия с полученными данными
+                // Например, вызов метода для обновления пользовательского интерфейса
+                updateUI();
+            }
+        };
+        task.execute();
+    }
+
 
     // Создайте метод для выполнения запроса и получения данных
     private void fetchCityData() {
@@ -601,6 +618,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         } else {
             // Данные не найдены или пустой список
             Log.d("City", "No data available.");
+        }
+
+        // Проверка, есть ли данные для отображения
+        if (transports != null && !transports.isEmpty()) {
+            for (Transport transport : transports) {
+                System.out.println("Transport Index: " + transport.getTitle());
+                System.out.println("CorX: " + transport.getLatitude());
+                System.out.println("CorY: " + transport.getLongitude());
+                System.out.println("Battery: " + transport.getBattery());
+                System.out.println("Stan ID: " + transport.isFree());
+                System.out.println("Type: " + transport.getType());
+                // Выведите остальные поля по аналогии
+                TripStared_1();
+            }
+        } else {
+            System.out.println("Получен пустой список транспортов");
         }
     }
 

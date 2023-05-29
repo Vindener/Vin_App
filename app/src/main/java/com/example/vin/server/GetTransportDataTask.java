@@ -1,18 +1,25 @@
 package com.example.vin.server;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.Toast;
+
+import com.example.vin.maps.Transport;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GetTransportDataTask extends AsyncTask<Void, Void, String> {
-    private static final String SERVER_URL = "http://192.168.0.103:5000/transport";
+public class GetTransportDataTask extends AsyncTask<Void, Void,  List<Transport>> {
+    String API_URL = ApiConstants.API_URL+"transport";
 
     public String transport_index;
     public String corX;
@@ -21,72 +28,81 @@ public class GetTransportDataTask extends AsyncTask<Void, Void, String> {
     public String typeId;
     public String qrCode;
 
+    private Context context;
+
+    public GetTransportDataTask(Context context) {
+        this.context = context;
+    }
+
+
     @Override
-    protected String doInBackground(Void... params) {
-        String result = "";
+    protected List<Transport> doInBackground(Void... voids) {
+        List<Transport> transportList = new ArrayList<>();
 
         try {
-            URL url = new URL(SERVER_URL);
+            // Создайте URL-адрес для запроса
+            URL url = new URL(API_URL);
+
+            // Создайте соединение HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            // Проверьте код ответа сервера
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String line;
-                StringBuilder response = new StringBuilder();
+                // Получите входной поток данных
+                InputStream inputStream = connection.getInputStream();
 
+                // Прочтите данные JSON
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
                 while ((line = reader.readLine()) != null) {
-                    response.append(line);
+                    stringBuilder.append(line);
                 }
                 reader.close();
 
-                result = response.toString();
-                System.out.println("все ок: " + result);
-            } else {
-                result = "Error: " + responseCode;
-                System.out.println("десь помилка: " + result);
-            }
+                // Обработайте полученные данные JSON
+                JSONArray jsonArray = new JSONArray(stringBuilder.toString());
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-            connection.disconnect();
+                    // Создайте объект Transport и извлеките значения полей
+                    Transport transport = new Transport();
+                    transport.setTitle(String.valueOf(jsonObject.getInt("transport_index")));
+                    transport.setLatitude(jsonObject.getDouble("corX"));
+                    transport.setLongitude(jsonObject.getDouble("corY"));
+                    transport.setBattery(jsonObject.getInt("battery"));
+                    transport.setStan(jsonObject.getInt("stan_id"));
+                    transport.setType(jsonObject.getInt("type_id"));
+
+                    // Добавьте объект Transport в список
+                    transportList.add(transport);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            result = "Error: " + e.getMessage();
-            System.out.println("Не підключилось: " + result);
         }
 
-        return result;
+        return transportList;
     }
+
 
     @Override
-    protected void onPostExecute(String result) {
-        // Обработка результата запроса
-        if (!result.startsWith("Error")) {
-            // Разбор ответа и сохранение данных в переменные
-            try {
-                JSONArray jsonArray = new JSONArray(result);
-                JSONObject transportData = jsonArray.getJSONObject(0); // Первый объект в массиве
-
-                transport_index = transportData.getString("transport_index");
-                corX = transportData.getString("corX");
-                corY = transportData.getString("corY");
-                stanId = transportData.getString("stan_id");
-                typeId = transportData.getString("type_id");
-                qrCode = transportData.getString("qr_code");
-
-                // Теперь у вас есть доступ к данным и можете использовать их в вашем коде
-                // Например:
-                // myVariable = index;
-                // myOtherVariable = corX;
-                // ...
-                System.out.println("все ок з присвоїнням: " + result);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                result = "Error: " + e.getMessage();
-                System.out.println(" помилка присвоїння: " + result);
+    protected void onPostExecute(List<Transport> transportList) {
+        if (transportList != null && !transportList.isEmpty()) {
+            // Обработка полученных данных
+            for (Transport transport : transportList) {
+                Toast.makeText(context, "Transport Index: " + transport.getTitle(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "CorX: " + transport.getLatitude(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "CorY: " + transport.getLongitude(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Battery: " + transport.getBattery(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Stan ID: " + transport.isFree(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Type ID: " + transport.getType(), Toast.LENGTH_SHORT).show();
             }
+        } else {
+            Toast.makeText(context, "Ошибка при получении данных с сервера", Toast.LENGTH_SHORT).show();
         }
-
-        // Продолжайте обрабатывать результат запроса или ошибку здесь
     }
+
 }

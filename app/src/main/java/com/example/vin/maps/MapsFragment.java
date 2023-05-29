@@ -40,6 +40,7 @@ import com.example.vin.server.GetCityDataTask;
 import com.example.vin.server.GetTransportDataTask;
 import com.example.vin.server.GetTransportTypeTask;
 import com.example.vin.server.Trafic;
+import com.example.vin.server.updateTransportStan;
 import com.example.vin.trip.CurrentTripActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -290,11 +291,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         bottomSheetImage.setImageDrawable(drawable);
                         Trafic firstTrafic = traficList.get(0);
                         traficPrice = firstTrafic.getPriceOf1();
+
+                        TransportX = transport.getLatitude();
+                        TransportY = transport.getLongitude();
                     } else if (transport.getType() == 2) {
                         Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
                         bottomSheetImage.setImageDrawable(drawable);
                         Trafic firstTrafic = traficList.get(1);
                         traficPrice = firstTrafic.getPriceOf1();
+
+                        TransportX = transport.getLatitude();
+                        TransportY = transport.getLongitude();
                     }
                 }
                 break;
@@ -319,6 +326,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     //StartTrip
+    private double TransportX;
+    private double TransportY;
+
 
     private void StartTrip(){
         if(userBalance >= 100) {
@@ -337,8 +347,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
 
             editor.apply();
+            updateTransportStan(Integer.parseInt(selectedMarkerTitle),TransportX,TransportY,50,2);
 
+//            updateTransportStan(Integer.parseInt(selectedMarker.getTitle()),TransportX,TransportY,50,2);
             Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+
 
             HideTransport();
             TripStarted();
@@ -646,9 +659,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 //            task.execute("10.0", "20.0", "1", "2", "ABC123");
 
      //   fetchTransportData();
-        fetchCityData();
-
-
+       // fetchCityData();
+        updateTransportStan(5,10.0,20.0,50,1);
     }
+
+
+    //Update Stan
+
+    public void updateTransportStan(int index,double corX_,double corY_,int battery_, int stan) {
+        int transportIndex = index;
+        double corX = corX_;
+        double corY = corY_;
+        int battery = battery_;
+        int stanId = stan;
+
+        updateTransportStan updateTransportStanTask = new updateTransportStan(transportIndex, corX, corY, battery, stanId);
+        updateTransportStanTask.execute();
+    }
+
+
 
 }

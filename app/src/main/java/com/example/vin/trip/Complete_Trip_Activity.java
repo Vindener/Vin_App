@@ -17,6 +17,7 @@ import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
 import com.example.vin.server.Trafic;
+import com.example.vin.server.updateTransportStan;
 
 public class Complete_Trip_Activity extends AppCompatActivity {
 
@@ -80,6 +81,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         String costString = sharedPreferences.getString("costTrip", "");
+        String selectedMarkerTitle = sharedPreferences.getString("TransportNumber", "");
 
         costString = costString.replace(",", ".");
 
@@ -94,6 +96,10 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         editor1.apply();
 
         Toast.makeText(this, " New balance - "+ new_Balance + " cost - "+cost, Toast.LENGTH_SHORT).show();
+
+        double  TransportX= 49.8926838;
+        double  TransportY= 28.5903351;
+        updateTransportStan(Integer.parseInt(selectedMarkerTitle),TransportX,TransportY,50,1);
 
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -124,5 +130,16 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         Intent myIntent = new Intent(Complete_Trip_Activity.this, MainActivity.class);
         Complete_Trip_Activity.this.startActivity(myIntent);
         finish();
+    }
+
+    public void updateTransportStan(int index,double corX_,double corY_,int battery_, int stan) {
+        int transportIndex = index;
+        double corX = corX_;
+        double corY = corY_;
+        int battery = battery_;
+        int stanId = stan;
+
+        updateTransportStan updateTransportStanTask = new updateTransportStan(transportIndex, corX, corY, battery, stanId);
+        updateTransportStanTask.execute();
     }
 }

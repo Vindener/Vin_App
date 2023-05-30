@@ -6,26 +6,24 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_profile"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_account_circle"
             android:title="Профіль"
             tools:ignore="DuplicateIds" />
         <item
             android:id="@+id/nav_payment"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Поповнення рахунку"
-            tools:ignore="DuplicateIds" />
+            android:icon="@drawable/ic_payments"
+            android:title="Поповнення балансу" />
         <item
             android:id="@+id/nav_list"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Історія поїздок"
-            tools:ignore="DuplicateIds" />
+            android:icon="@drawable/ic_history"
+            android:title="Історія поїздок" />
         <item
             android:id="@+id/nav_documentation"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_text_snippet"
             android:title="Документація" />
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_exit_to_app"
             android:title="Вихід" />
     </group>
 </menu>

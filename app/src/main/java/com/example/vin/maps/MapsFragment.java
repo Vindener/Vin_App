@@ -34,11 +34,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
+import com.example.vin.login.CheckEmailExistsDataTask;
+import com.example.vin.payment.Wallet;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.City;
 import com.example.vin.server.GetCityDataTask;
 import com.example.vin.server.GetTransportDataTask;
 import com.example.vin.server.GetTransportTypeTask;
+import com.example.vin.payment.GetWalletDataTask;
 import com.example.vin.server.Trafic;
 import com.example.vin.server.updateTransportStan;
 import com.example.vin.trip.CurrentTripActivity;
@@ -128,7 +131,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 }
 
                 // Добавляем полигон на карту
-                mMap.addPolygon(polygonOptions);
+                polygonMap = mMap.addPolygon(polygonOptions);
                 }
 
 
@@ -539,6 +542,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         fetchCityData();
         fetchTypeData();
         fetchTransportData();
+        fetchWalletData();
     }
 
     // Создайте метод для выполнения запроса и получения данных
@@ -660,7 +664,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
      //   fetchTransportData();
        // fetchCityData();
-        updateTransportStan(5,10.0,20.0,50,1);
+        //updateTransportStan(5,10.0,20.0,50,1);
+       // fetchWalletData();
+        testEmail();
     }
 
 
@@ -677,6 +683,56 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         updateTransportStanTask.execute();
     }
 
+    //Get Wallet
+    public void fetchWalletData(){
+        // Получение экземпляра SharedPreferences
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        int userIndex = sharedPreferences.getInt("userIndex", 1);
+        GetWalletDataTask task = new GetWalletDataTask(context, new GetWalletDataTask.OnWalletDataReceivedListener() {
+            @Override
+            public void onWalletDataReceived(Wallet wallet) {
+                // Полученные данные о балансе
+                double balance = wallet.getBalance();
+                Toast.makeText(getActivity(), "Balance: "+balance, Toast.LENGTH_SHORT).show();
+                // Дальнейшая обработка полученного баланса
+                userBalance = balance;
 
+
+                // Редактор для изменения значений SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                // Сохранение значения balanceFloat в SharedPreferences
+                editor.putFloat("balance", (float) balance);
+                editor.apply();
+                ShowProfileiInfo();
+            }
+
+            @Override
+            public void onWalletDataError() {
+                // Обработка ошибки при получении данных о балансе
+            }
+        });
+        task.execute(String.valueOf(userIndex));
+    }
+
+
+    private void testEmail(){
+        String emailToCheck = "user@user.com";
+
+        CheckEmailExistsDataTask task = new CheckEmailExistsDataTask(new CheckEmailExistsDataTask.OnEmailExistsListener() {
+            @Override
+            public void onEmailExists(boolean exists) {
+                if (exists) {
+                    // Указанный email уже существует
+                    Toast.makeText(getActivity(), "Існує такий емайл: ", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Указанный email не существует
+                    Toast.makeText(getActivity(), "Не Існує такий емайл: ", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        });
+        task.execute(emailToCheck);
+    }
 
 }

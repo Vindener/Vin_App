@@ -16,15 +16,18 @@ import android.widget.Toast;
 import com.example.vin.MainActivity;
 import com.example.vin.R;
 import com.example.vin.maps.MapsFragment;
+import com.example.vin.payment.UpdateWalletBalanceDataTask;
 import com.example.vin.server.Trafic;
 import com.example.vin.server.updateTransportStan;
 
 public class Complete_Trip_Activity extends AppCompatActivity {
 
-    Button bthGoToMap;
+    private Button bthGoToMap;
 
-    TextView EndCost,EndTarifTextView,EndDuration,EndTripCost,EndDurationTrip;
-    ImageView EndTripImage;
+    private TextView EndCost,EndTarifTextView,EndDuration,EndTripCost,EndDurationTrip;
+    private ImageView EndTripImage;
+    private double new_Balance;
+    private int userIndex;
 
     private int selectedTransportType;
     @Override
@@ -78,6 +81,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
     private void EndTrip(){
         SharedPreferences sharedPreferences1 = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         Float balance_ = sharedPreferences1.getFloat("balance",0);
+        userIndex = sharedPreferences1.getInt("userIndex", 1);
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         String costString = sharedPreferences.getString("costTrip", "");
@@ -88,7 +92,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         Double cost = Double.parseDouble(costString);
         Double userBalance = Double.parseDouble(String.valueOf(balance_));
 
-        double new_Balance = userBalance - cost;
+        new_Balance = userBalance - cost;
 
         SharedPreferences.Editor editor1 = sharedPreferences1.edit();
 
@@ -101,7 +105,6 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         double  TransportY= 28.5903351;
         updateTransportStan(Integer.parseInt(selectedMarkerTitle),TransportX,TransportY,50,1);
 
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", false);
         editor.putString("TransportNumber", "");
@@ -109,9 +112,9 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         editor.putString("durationTrip", "");
         editor.putString("costTrip", "");
 
-
-
         editor.apply();
+
+        UpdateWalletBalance();
 
         MapsFragment.TripStarted();
     }
@@ -141,5 +144,10 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         updateTransportStan updateTransportStanTask = new updateTransportStan(transportIndex, corX, corY, battery, stanId);
         updateTransportStanTask.execute();
+    }
+
+    private void UpdateWalletBalance(){
+        UpdateWalletBalanceDataTask updateTask = new UpdateWalletBalanceDataTask(Complete_Trip_Activity.this, String.valueOf(userIndex), new_Balance);
+        updateTask.execute();
     }
 }

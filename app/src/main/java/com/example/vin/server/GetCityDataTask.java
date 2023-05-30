@@ -64,6 +64,7 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
 
                     // Создайте объект City и извлеките значение поля city
                     City city = new City();
+                    city.setCityIndex(jsonObject.getInt("index_place"));
                     city.setCityName(jsonObject.getString("city"));
 
                     // Извлеките объект координат
@@ -115,6 +116,7 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
         if (cityList != null && !cityList.isEmpty()) {
             // Обработка полученных данных
             for (City city : cityList) {
+                Toast.makeText(context, "City Index: " + city.getCityIndex(), Toast.LENGTH_SHORT).show();
                 Toast.makeText(context, "City Name: " + city.getCityName(), Toast.LENGTH_SHORT).show();
                 Toast.makeText(context, "City coordinates: " + Arrays.toString(city.getCoordinates()), Toast.LENGTH_SHORT).show();
             }

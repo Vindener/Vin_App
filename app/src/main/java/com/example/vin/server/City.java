@@ -1,6 +1,7 @@
 package com.example.vin.server;
 
 public class City {
+    private int cityIndex;
     private String cityName;
     private double[] coordinates;
 
@@ -18,5 +19,13 @@ public class City {
 
     public void setCoordinates(double[] coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public int getCityIndex() {
+        return cityIndex;
+    }
+
+    public void setCityIndex(int cityIndex) {
+        this.cityIndex = cityIndex;
     }
 }

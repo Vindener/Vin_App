@@ -30,6 +30,9 @@ public class PaymentFragment extends Fragment {
     private EditText payCount;
     private TextView balance;
     private ImageView pay_qr;
+
+    private Float new_balance;
+    private int userIndex;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -77,20 +80,25 @@ public class PaymentFragment extends Fragment {
 
     private void Checkpay(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        userIndex = sharedPreferences.getInt("userIndex", 1);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         Float balance_ = sharedPreferences.getFloat("balance",0);
 
         balance = getActivity().findViewById(R.id.BalanceText);
 
-        Float add_balance = balance_ + Float.valueOf(payCount.getText().toString());
+        new_balance = balance_ + Float.valueOf(payCount.getText().toString());
 
-        editor.putFloat("balance",add_balance);
+        editor.putFloat("balance",new_balance);
         editor.apply();
 
-        Float new_balance = sharedPreferences.getFloat("balance",0);
+        Float new_balance_ = sharedPreferences.getFloat("balance",0);
 
-        balance.setText(new_balance.toString());
+        balance.setText(new_balance_.toString());
+
+        //Відправка значень на сервер
+        UpdateWalletBalance();
+
         generateQR();
         Toast.makeText(getActivity(), "Ви успішно поповнили баланс на: "+ payCount.getText().toString()+" грн.", Toast.LENGTH_SHORT).show();
     }
@@ -109,5 +117,10 @@ public class PaymentFragment extends Fragment {
         } catch (WriterException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void UpdateWalletBalance(){
+        UpdateWalletBalanceDataTask updateTask = new UpdateWalletBalanceDataTask(getContext(), String.valueOf(userIndex), new_balance);
+        updateTask.execute();
     }
 }

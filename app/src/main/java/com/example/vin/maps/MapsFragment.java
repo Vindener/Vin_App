@@ -35,6 +35,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
 import com.example.vin.login.CheckEmailExistsDataTask;
+import com.example.vin.login.CreateNewUserActivity;
+import com.example.vin.login.CreateUserDataTask;
 import com.example.vin.payment.Wallet;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
 import com.example.vin.server.City;
@@ -44,7 +46,9 @@ import com.example.vin.server.GetTransportTypeTask;
 import com.example.vin.payment.GetWalletDataTask;
 import com.example.vin.server.Trafic;
 import com.example.vin.server.updateTransportStan;
+import com.example.vin.trip.CreateTripDataTask;
 import com.example.vin.trip.CurrentTripActivity;
+import com.example.vin.trip.TripData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,11 +64,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -666,7 +673,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
        // fetchCityData();
         //updateTransportStan(5,10.0,20.0,50,1);
        // fetchWalletData();
-        testEmail();
+        testEndTrip();
     }
 
 
@@ -716,23 +723,39 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private void testEmail(){
-        String emailToCheck = "user@user.com";
+    private void testEndTrip(){
+        String transportId = "1";
+        String userId = "4";
+        String placeId = "2";
+        String timeStart = "2023-05-30T10:00:00Z";
+        String timeEnd = "2023-05-30T12:00:00Z";
+        String duration = "120";
+        String cost = "50.0";
 
-        CheckEmailExistsDataTask task = new CheckEmailExistsDataTask(new CheckEmailExistsDataTask.OnEmailExistsListener() {
+        System.out.println("Transport Index: " + transportId);
+        System.out.println("userId: " + userId);
+        System.out.println("placeId: " + placeId);
+        System.out.println("timeStart: " + timeStart);
+        System.out.println("timeEnd " + timeEnd);
+        System.out.println("duration: " + duration);
+        System.out.println("cost: " + cost);
+
+
+        //   TripData tripData = new TripData(userId,transportId, placeId, timeStart, timeEnd, duration, cost, foto);
+        CreateTripDataTask createTripTask = new CreateTripDataTask(new CreateTripDataTask.OnTripCreatedListener() {
             @Override
-            public void onEmailExists(boolean exists) {
-                if (exists) {
-                    // Указанный email уже существует
-                    Toast.makeText(getActivity(), "Існує такий емайл: ", Toast.LENGTH_SHORT).show();
+            public void onTripCreated(boolean success) {
+                if (success) {
+                    // Поездка успешно создана
+                    Toast.makeText(getActivity(), "поїздка  успешно созданы", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Указанный email не существует
-                    Toast.makeText(getActivity(), "Не Існує такий емайл: ", Toast.LENGTH_SHORT).show();
-
+                    // Ошибка при создании поездки
+                    Toast.makeText(getActivity(), "Ошибка при создании данных поїздка", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        task.execute(emailToCheck);
+        createTripTask.execute(transportId, userId, placeId, timeStart, timeEnd, duration, cost);
+
     }
 
 }

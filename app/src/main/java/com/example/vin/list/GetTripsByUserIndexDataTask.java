@@ -69,21 +69,11 @@ public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, Lis
                     Trips trips = new Trips();
                     trips.setTransportIndex(jsonObject.getInt("transport_id"));
                     trips.setCost(jsonObject.getDouble("cost"));
-                    trips.setDuration(jsonObject.getDouble("duration"));
+                    trips.setDuration(jsonObject.getString("duration"));
 
                     // Обработка даты и времени
-                    String timeStartStr = jsonObject.optString("time_start");
-                    String timeEndStr = jsonObject.optString("time_end");
-                    // Преобразование строкового представления в объект типа Date
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                    if (!timeStartStr.isEmpty()) {
-                        Date timeStart = dateFormat.parse(timeStartStr);
-                        trips.setTimeStart(timeStart);
-                    }
-                    if (!timeEndStr.isEmpty()) {
-                        Date timeEnd = dateFormat.parse(timeEndStr);
-                        trips.setTimeEnd(timeEnd);
-                    }
+                    String timeStartStr = jsonObject.getString("time_start");
+                    String timeEndStr = jsonObject.getString("time_end");
 
                     // Получите объект transport
                     JSONObject transportObject = jsonObject.getJSONObject("transport");

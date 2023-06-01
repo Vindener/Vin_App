@@ -62,12 +62,12 @@ public class ListFragment extends Fragment {
                         int transportId = trips.getTransportIndex();
                         int typeId = trips.getTypeId();
                         double cost = trips.getCost();
-                        double duration = trips.getDuration();
+                        String duration = trips.getDuration();
                         String  timeStart = trips.getTimeStart();
                         String timeEnd = trips.getTimeEnd();
 
                         // Другие действия с данными поездки
-                        itemList.add(new Item(typeId, cost + " UAH", "00"+String.valueOf(transportId), timeStart, timeEnd, String.valueOf(duration)+" хв"));
+                        itemList.add(new Item(typeId, cost + " UAH", "00"+String.valueOf(transportId), timeStart, timeEnd, duration));
                     }
 
                     // Здесь вы можете продолжить выполнение других действий с itemList,

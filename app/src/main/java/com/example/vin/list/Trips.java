@@ -6,7 +6,7 @@ public class Trips {
     private int typeId;
     private int transportIndex;
     private double cost;
-    private double duration;
+    private String duration;
     private String  timeStart;
     private String timeEnd;
 
@@ -36,11 +36,11 @@ public class Trips {
         this.cost = cost;
     }
 
-    public double getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 

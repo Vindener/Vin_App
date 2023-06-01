@@ -229,7 +229,7 @@ public class CurrentTripActivity extends AppCompatActivity {
         finish();
     }
 
-
+    private String EndTripString;
     private void EndTrip(){
         TimerOver = true;
 
@@ -237,17 +237,49 @@ public class CurrentTripActivity extends AppCompatActivity {
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String formattedCost = decimalFormat.format(cost);
 
+        // Вычислить итоговое значение времени окончания по добавлению duration к StartTime
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date startDate = null;
+        try {
+            startDate = dateFormat.parse(StartTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Вычислить дату и время окончания
+        Calendar endCalendar = Calendar.getInstance();
+        endCalendar.setTime(startDate);
+
+        // Разделить duration на часы, минуты и секунды
+        String[] timeParts = duration.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        int seconds = Integer.parseInt(timeParts[2]);
+
+        // Добавить часы, минуты и секунды к календарю
+        endCalendar.add(Calendar.HOUR_OF_DAY, hours);
+        endCalendar.add(Calendar.MINUTE, minutes);
+        endCalendar.add(Calendar.SECOND, seconds);
+        Date endDate = endCalendar.getTime();
+
+        // Преобразовать дату и время окончания в строку
+        String endTime = dateFormat.format(endDate);
+
+        // Сохранить значение endTime в переменной EndTrip
+        EndTripString = endTime;
+
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("costTrip", formattedCost);
         editor.putString("durationTrip", duration);
+        editor.putString("EndTime", EndTripString);
         editor.apply();
 
         Toast.makeText(this, "Зараз треба буде зробити фотографію транспорту", Toast.LENGTH_SHORT).show();
 
         TripStart = false;
 
-        Intent myIntent = new Intent(CurrentTripActivity.this, CameraEndActivity.class);
+        Intent myIntent = new Intent(CurrentTripActivity.this, Complete_Trip_Activity.class);
         CurrentTripActivity.this.startActivity(myIntent);
         finish();
         //ShowContainer();

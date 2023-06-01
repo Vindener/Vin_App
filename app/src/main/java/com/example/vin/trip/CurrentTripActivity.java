@@ -222,11 +222,9 @@ public class CurrentTripActivity extends AppCompatActivity {
         editor.putString("durationTrip", duration);
         editor.apply();
 
-        Toast.makeText(this, "Зараз треба буде зробити фотографію транспорту", Toast.LENGTH_SHORT).show();
-
         TripStart = false;
 
-        Intent myIntent = new Intent(CurrentTripActivity.this, CameraEndActivity.class);
+        Intent myIntent = new Intent(CurrentTripActivity.this, Complete_Trip_Activity.class);
         CurrentTripActivity.this.startActivity(myIntent);
         finish();
     }

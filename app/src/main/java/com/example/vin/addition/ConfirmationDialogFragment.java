@@ -93,7 +93,7 @@ public class ConfirmationDialogFragment  extends DialogFragment {
             getActivity().finish();
         }
         else{
-
+            getActivity().onBackPressed();
         }
     }
 

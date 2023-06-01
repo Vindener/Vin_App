@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.vin.MainActivity;
 import com.example.vin.R;
 
 import java.io.BufferedReader;
@@ -54,12 +55,46 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("email", email);
             editor.apply();
-
-            Intent myIntent = new Intent(LoginActivity.this, VerficationEmailActivity.class);
-            LoginActivity.this.startActivity(myIntent);
-            finish();
+            Toast.makeText(LoginActivity.this, "Result: "+email, Toast.LENGTH_SHORT).show();
+            CheckEmail();
         } else {
-            Toast.makeText(this, "Помилка: Ви не правильно ввели email!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "Помилка: Ви не правильно ввели email!", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void CheckEmail(){
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        CheckEmailExistsDataTask task = new CheckEmailExistsDataTask(new CheckEmailExistsDataTask.OnEmailExistsListener() {
+            @Override
+            public void onEmailExists(boolean exists) {
+                if (exists) {
+                    // Указанный email уже существует
+                    Toast.makeText(LoginActivity.this, "Існує такий емайл: ", Toast.LENGTH_SHORT).show();
+
+                    editor.putString("email", email);
+                    editor.putBoolean("registered",true);
+                    editor.apply();
+
+                    Intent myIntent = new Intent(LoginActivity.this, VerficationEmailActivity.class);
+                    LoginActivity.this.startActivity(myIntent);
+                    finish();
+                } else {
+                    // Указанный email не существует
+                    Toast.makeText(LoginActivity.this, "Не Існує такий емайл: ", Toast.LENGTH_SHORT).show();
+
+                    editor.putString("email", email);
+                    editor.putBoolean("registered",false);
+                    editor.apply();
+
+                    Intent myIntent = new Intent(LoginActivity.this, VerficationEmailActivity.class);
+                    LoginActivity.this.startActivity(myIntent);
+                    finish();
+
+                }
+            }
+        });
+        task.execute(email);
     }
 }

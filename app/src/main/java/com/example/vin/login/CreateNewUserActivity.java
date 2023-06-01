@@ -79,21 +79,57 @@ public class CreateNewUserActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     public void CreateUser(){
-        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("name", name);
-        editor.putString("phone", phone);
-        editor.putFloat("balance",0 );
-        editor.putBoolean("isFirstRun", false);
-        editor.apply();
+        CreateUserDataTask task = new CreateUserDataTask(email, phone, name, new CreateUserDataTask.OnUserCreatedListener() {
+            @Override
+            public void onUserCreated(boolean created) {
+                if (created) {
+                    // Данные пользователя успешно созданы на сервере
+                    Toast.makeText(CreateNewUserActivity.this, "Данные пользователя успешно созданы", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Ошибка при создании данных пользователя на сервере
+                    Toast.makeText(CreateNewUserActivity.this, "Ошибка при создании данных пользователя", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        task.execute();
+
+        GetProfileInfo();
 
         Toast.makeText(CreateNewUserActivity.this, "Все добре!", Toast.LENGTH_SHORT).show();
 
         Intent myIntent = new Intent(CreateNewUserActivity.this, MainActivity.class);
         CreateNewUserActivity.this.startActivity(myIntent);
         finish();
+    }
+
+    private void GetProfileInfo(){
+        GetUserByEmailDataTask task = new GetUserByEmailDataTask(new GetUserByEmailDataTask.OnUserByEmailListener() {
+            @Override
+            public void onUserByEmail(User user) {
+                if (user != null) {
+                    // Используйте значения переменных userIndex, phone и name
+                    userIndex = user.getUserIndex();
+                    phone = user.getPhone();
+                    name = user.getName();
+
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("userIndex", userIndex);
+                    editor.putString("name", name);
+                    editor.putString("phone", phone);
+                    editor.putFloat("balance",0 );
+                    editor.putBoolean("isFirstRun", false);
+                    editor.apply();
+                    // Далее выполните необходимые действия с полученными данными
+                } else {
+                    // Обработка случая, когда пользователь не найден
+                }
+            }
+        });
+        task.execute(email);
     }
 }

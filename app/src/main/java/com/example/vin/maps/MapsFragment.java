@@ -23,6 +23,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,10 +38,22 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.vin.R;
+import com.example.vin.login.CheckEmailExistsDataTask;
+import com.example.vin.login.CreateNewUserActivity;
+import com.example.vin.login.CreateUserDataTask;
+import com.example.vin.payment.Wallet;
 import com.example.vin.addition.PermissionDialogFragment;
 import com.example.vin.qrcode.scanner.QrCodeScanner;
+import com.example.vin.server.City;
+import com.example.vin.server.GetCityDataTask;
+import com.example.vin.server.GetTransportDataTask;
+import com.example.vin.server.GetTransportTypeTask;
+import com.example.vin.payment.GetWalletDataTask;
 import com.example.vin.server.Trafic;
+import com.example.vin.server.updateTransportStan;
+import com.example.vin.trip.CreateTripDataTask;
 import com.example.vin.trip.CurrentTripActivity;
+import com.example.vin.trip.TripData;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -55,20 +69,34 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.ParseException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
+
+    private Button testbutton;
+
+
     private GoogleMap mMap;
     private Polygon polygonMap;
     private static Button bthGoToTrip;
     private List<Transport> transports = new ArrayList<>();
     private Marker selectedMarker; // Вибраний маркер
+
+    private Button bthShowCurrentTrip;
+
+
+    private Marker selectedMarker; // Выбранный маркер
+
     private String  selectedMarkerTitle = "";
     private int selectedTransportType = 1;
     private String currentDate= null;
@@ -140,37 +168,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         if(polygonMap!=null){
             polygonMap.remove();
         }
-        // Створення массив з координатами
-        LatLng[] coordinates = new LatLng[10];
-        coordinates[0] = new LatLng(49.944961, 28.611455);
-        coordinates[1] = new LatLng(49.939776, 28.617922);
-        coordinates[2] = new LatLng(49.930024, 28.627584);
-        coordinates[3] = new LatLng(49.900735, 28.632276);
-        coordinates[4] = new LatLng(49.860025, 28.615820);
-        coordinates[5] = new LatLng(49.873121, 28.568991);
-        coordinates[6] = new LatLng(49.876661, 28.554013);
-        coordinates[7] = new LatLng(49.907011, 28.556739);
-        coordinates[8] = new LatLng(49.933163, 28.586319);
-        coordinates[9] = new LatLng(49.942839, 28.603362);
+            for (City city : cityList) {
 
-        // Створення об'єкта PolygonOptions
-        PolygonOptions polygonOptions = new PolygonOptions();
-        polygonOptions.strokeWidth(5);
-        polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
-        polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
+                double[] coordinates = city.getCoordinates();
 
-        // Додавання координати в PolygonOptions
-        for (LatLng coordinate : coordinates) {
-            polygonOptions.add(coordinate);
-        }
+                // Создаем объект PolygonOptions для текущего объекта City
+                PolygonOptions polygonOptions = new PolygonOptions();
+                polygonOptions.strokeWidth(5);
+                polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
+                polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
 
-        // Додаємо полігон на карту
-        polygonMap = mMap.addPolygon(polygonOptions);
+                // Добавляем координаты в PolygonOptions
+                for (int i = 0; i < coordinates.length; i += 2) {
+                    double latitude = coordinates[i];
+                    double longitude = coordinates[i + 1];
+                    LatLng coordinate = new LatLng(latitude, longitude);
+                    polygonOptions.add(coordinate);
+                }
+
+                // Добавляем полигон на карту
+                polygonMap = mMap.addPolygon(polygonOptions);
+                }
+
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        WorkServer();
 
         Button bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
         bthQRCodeScanner.setOnClickListener(new View.OnClickListener() {
@@ -208,13 +234,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         handler.postDelayed(r, 200);
         //ShowProfileiInfo();
 
-        addMarker("11",true,49.8926838, 28.5903351,1,50);
-        addMarker("12",true,49.892613, 28.590552,2,30);
-        addMarker("1",false,49.886918, 28.594652,1,40);
-        addMarker("14",true,49.894497, 28.582444,2,50);
-        addMarker("15",false,49.894579, 28.582607,1,70);
-        addMarker("16",false,49.895602, 28.583382,1,80);
-        addMarker("17",true,49.895748, 28.583480,1,100);
+//        addMarker("11",true,49.8926838, 28.5903351,1);
+//        addMarker("12",true,49.892613, 28.590552,2);
+//        addMarker("13",false,49.886918, 28.594652,1);
+//        addMarker("14",true,49.894497, 28.582444,2);
+//        addMarker("15",false,49.894579, 28.582607,1);
+//        addMarker("16",false,49.895602, 28.583382,1);
+//        addMarker("17",true,49.895748, 28.583480,1);
 
         return view;
     }
@@ -274,8 +300,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         showCurrentLocation();
 
-        DrawPolygon();
-
         TripStarted();
         TripStared_1();
 
@@ -316,6 +340,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         ImageView bottomSheetImage = bottomSheetDialog.findViewById(R.id.bottomSheetImage);
         int batteryValueLevel;
 
+        double traficPrice = 3.;
+
         for (Transport transport : transports) {
             if (transport.getTitle().equals(markerId)) {
                 Marker marker = transport.getMarker();
@@ -323,11 +349,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     if (transport.getType() == 1) {
                         Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_scooter);
                         bottomSheetImage.setImageDrawable(drawable);
-                        selectedTransportType = 1;
+                        Trafic firstTrafic = traficList.get(0);
+                        traficPrice = firstTrafic.getPriceOf1();
+
+                        TransportX = transport.getLatitude();
+                        TransportY = transport.getLongitude();
                     } else if (transport.getType() == 2) {
                         Drawable drawable = getResources().getDrawable(R.drawable.ic_electric_bike);
                         bottomSheetImage.setImageDrawable(drawable);
-                        selectedTransportType = 2;
+                        Trafic firstTrafic = traficList.get(1);
+                        traficPrice = firstTrafic.getPriceOf1();
+
+                        TransportX = transport.getLatitude();
+                        TransportY = transport.getLongitude();
                     }
                     batteryValueLevel = transport.getBatteryLevel();
                     batteryLevel.setText(String.valueOf(batteryValueLevel)+"%");
@@ -377,10 +411,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         });
 
         textView.setText(markerId);
-        bottomSheetTrafic.setText(String.valueOf(Trafic.getTrafic(selectedTransportType)));
+        bottomSheetTrafic.setText(String.valueOf(traficPrice));
 
         bottomSheetDialog.show();
     }
+
+    //StartTrip
+    private double TransportX;
+    private double TransportY;
+
+
 
     private void ShowDialogBeforeStart(){
         if(userBalance >= 100) {
@@ -428,14 +468,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         GetCurrentDate();
         editor.putString("CurrentDateTrip", currentDate);
 
-        editor.apply();
 
-        Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+            editor.apply();
+            updateTransportStan(Integer.parseInt(selectedMarkerTitle),TransportX,TransportY,50,2);
 
-        HideTransport();
-        TripStarted();
-        TripStared_1();
-        showMarkerByTitle();
+//            updateTransportStan(Integer.parseInt(selectedMarker.getTitle()),TransportX,TransportY,50,2);
+            Toast.makeText(getActivity(), "Поїздка почалась!", Toast.LENGTH_SHORT).show();
+
+
+            HideTransport();
+            TripStarted();
+            TripStared_1();
+            showMarkerByTitle();
+        }
+        else{
+            Toast.makeText(getActivity(), "Для початку поїздку ви повинні мати як мінімум на балнасі 100 грн!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void TripStarted(){
@@ -530,8 +578,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void addMarker(String title, boolean isFree, double latitde,double longitude,int type, int battery) {
-        Transport transport = new Transport(title, isFree, latitde, longitude,type,battery);
+    public void addMarker(String title, boolean isFree, double latitde,double longitude,int type) {
+        Transport transport = new Transport(title, isFree, latitde, longitude,type,0);
         transports.add(transport);
     }
 
@@ -558,6 +606,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
+
 
     public void ShowProfileiInfo(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
@@ -587,6 +636,228 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         // Форматуємо дату і час в String
         currentDate = dateFormat.format(calendar.getTime());
+    }
+
+
+    // Добавьте поле для списка объектов Trafic
+    private List<Trafic> traficList;
+
+    //Міста
+    private List<City> cityList;
+    //Transport
+    private List<Transport> transports = new ArrayList<>();
+
+    private void WorkServer(){
+        fetchCityData();
+        fetchTypeData();
+        fetchTransportData();
+        fetchWalletData();
+    }
+
+    // Создайте метод для выполнения запроса и получения данных
+    private void fetchTypeData() {
+        GetTransportTypeTask task = new GetTransportTypeTask() {
+            @Override
+            protected void onPostExecute(List<Trafic> result) {
+                // Получите данные и обновите список объектов Trafic
+                traficList = result;
+
+                // Обновите пользовательский интерфейс вашего фрагмента с использованием полученных данных
+                //updateUI();
+            }
+        };
+        task.execute();
+    }
+
+    private void fetchTransportData() {
+        GetTransportDataTask task = new GetTransportDataTask(context) {
+            @Override
+            protected void onPostExecute(List<Transport> result) {
+                // Получите данные и сохраните список транспортов в переменную transports
+                transports = result;
+
+                // Здесь вы можете выполнять нужные вам действия с полученными данными
+                // Например, вызов метода для обновления пользовательского интерфейса
+                updateUI();
+            }
+        };
+        task.execute();
+    }
+
+
+    // Создайте метод для выполнения запроса и получения данных
+    private void fetchCityData() {
+        GetCityDataTask task = new GetCityDataTask(getContext()) {
+            @Override
+            protected void onPostExecute(List<City> result) {
+                // Получите данные и обновите список объектов City
+                cityList = result;
+
+                // Обновите пользовательский интерфейс вашего фрагмента или активности с использованием полученных данных
+                updateUI();
+                DrawPolygon();
+            }
+        };
+        task.execute();
+    }
+
+    // Метод для обновления пользовательского интерфейса фрагмента с использованием полученных данных
+    private void updateUI() {
+        if (traficList != null && !traficList.isEmpty()) {
+            // Используйте данные объектов Trafic для обновления пользовательского интерфейса
+            Toast.makeText(getActivity(), "Go2! ", Toast.LENGTH_SHORT).show();
+            // Пример: Вывод данных в Log
+            for (Trafic trafic : traficList) {
+                Log.d("TransportTypeInfo", "1Type Name: " + trafic.getTypeName());
+                Log.d("TransportTypeInfo", "2Price of 1: " + trafic.getPriceOf1());
+            }
+
+            // Пример: Обновление TextView с данными объектов Trafic
+//            TextView typeNameTextView = getView().findViewById(R.id.typeNameTextView);
+
+            // Предполагая, что у вас есть соответствующие TextView в макете фрагмента
+            Trafic firstTrafic = traficList.get(0);
+//            typeNameTextView.setText(firstTrafic.getTypeName());
+//            priceOf1TextView.setText(String.valueOf(firstTrafic.getPriceOf1()));
+
+            // Другие операции с данными объектов Trafic и обновление интерфейса...
+        } else {
+            Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
+        }
+
+
+        // Проверка, есть ли данные для отображения
+        if (cityList != null && !cityList.isEmpty()) {
+            Toast.makeText(getActivity(), "Go3! ", Toast.LENGTH_SHORT).show();
+            // Вывод данных
+            for (City city : cityList) {
+                String cityName = city.getCityName();
+                double[] coordinates = city.getCoordinates();
+
+                // Вывод данных в лог
+                Log.d("City", "City Name: " + cityName);
+                Log.d("City", "Coordinates: " + Arrays.toString(coordinates));
+
+                // Другие операции с данными, например, обновление пользовательского интерфейса
+                // ...
+            }
+        } else {
+            // Данные не найдены или пустой список
+            Log.d("City", "No data available.");
+        }
+
+        // Проверка, есть ли данные для отображения
+        if (transports != null && !transports.isEmpty()) {
+            for (Transport transport : transports) {
+                System.out.println("Transport Index: " + transport.getTitle());
+                System.out.println("CorX: " + transport.getLatitude());
+                System.out.println("CorY: " + transport.getLongitude());
+                System.out.println("Battery: " + transport.getBattery());
+                System.out.println("Stan ID: " + transport.isFree());
+                System.out.println("Type: " + transport.getType());
+                // Выведите остальные поля по аналогии
+                TripStared_1();
+            }
+        } else {
+            System.out.println("Получен пустой список транспортов");
+        }
+    }
+
+    public void test(){
+
+        Toast.makeText(getActivity(), "Go! ", Toast.LENGTH_SHORT).show();
+
+        //Create
+//            CreateTransport task = new CreateTransport();
+//            task.execute("10.0", "20.0", "1", "2", "ABC123");
+
+     //   fetchTransportData();
+       // fetchCityData();
+        //updateTransportStan(5,10.0,20.0,50,1);
+       // fetchWalletData();
+        testEndTrip();
+    }
+
+
+    //Update Stan
+
+    public void updateTransportStan(int index,double corX_,double corY_,int battery_, int stan) {
+        int transportIndex = index;
+        double corX = corX_;
+        double corY = corY_;
+        int battery = battery_;
+        int stanId = stan;
+
+        updateTransportStan updateTransportStanTask = new updateTransportStan(transportIndex, corX, corY, battery, stanId);
+        updateTransportStanTask.execute();
+    }
+
+    //Get Wallet
+    public void fetchWalletData(){
+        // Получение экземпляра SharedPreferences
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        int userIndex = sharedPreferences.getInt("userIndex", 1);
+        GetWalletDataTask task = new GetWalletDataTask(context, new GetWalletDataTask.OnWalletDataReceivedListener() {
+            @Override
+            public void onWalletDataReceived(Wallet wallet) {
+                // Полученные данные о балансе
+                double balance = wallet.getBalance();
+                Toast.makeText(getActivity(), "Balance: "+balance, Toast.LENGTH_SHORT).show();
+                // Дальнейшая обработка полученного баланса
+                userBalance = balance;
+
+
+                // Редактор для изменения значений SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                // Сохранение значения balanceFloat в SharedPreferences
+                editor.putFloat("balance", (float) balance);
+                editor.apply();
+                ShowProfileiInfo();
+            }
+
+            @Override
+            public void onWalletDataError() {
+                // Обработка ошибки при получении данных о балансе
+            }
+        });
+        task.execute(String.valueOf(userIndex));
+    }
+
+
+    private void testEndTrip(){
+        String transportId = "1";
+        String userId = "4";
+        String placeId = "2";
+        String timeStart = "2023-05-30T10:00:00Z";
+        String timeEnd = "2023-05-30T12:00:00Z";
+        String duration = "120";
+        String cost = "50.0";
+
+        System.out.println("Transport Index: " + transportId);
+        System.out.println("userId: " + userId);
+        System.out.println("placeId: " + placeId);
+        System.out.println("timeStart: " + timeStart);
+        System.out.println("timeEnd " + timeEnd);
+        System.out.println("duration: " + duration);
+        System.out.println("cost: " + cost);
+
+
+        //   TripData tripData = new TripData(userId,transportId, placeId, timeStart, timeEnd, duration, cost, foto);
+        CreateTripDataTask createTripTask = new CreateTripDataTask(new CreateTripDataTask.OnTripCreatedListener() {
+            @Override
+            public void onTripCreated(boolean success) {
+                if (success) {
+                    // Поездка успешно создана
+                    Toast.makeText(getActivity(), "поїздка  успешно созданы", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Ошибка при создании поездки
+                    Toast.makeText(getActivity(), "Ошибка при создании данных поїздка", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        createTripTask.execute(transportId, userId, placeId, timeStart, timeEnd, duration, cost);
+
     }
 
 }

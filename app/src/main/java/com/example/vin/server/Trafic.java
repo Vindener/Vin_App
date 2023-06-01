@@ -5,6 +5,9 @@ public class Trafic {
     private double perces_1 = 4.;
     private double perces_2 = 3.;
 
+    private String  typeName;
+    private double perSec;
+
     public static double getTrafic(int type){
         if(type == 1){
             return 4.;
@@ -12,5 +15,21 @@ public class Trafic {
             return 3.;
         }
         return 4.;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public void setPriceOf1(double priceOf1) {
+        this.perSec = priceOf1;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public double getPriceOf1() {
+        return perSec;
     }
 }

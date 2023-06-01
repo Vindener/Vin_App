@@ -66,20 +66,13 @@ import java.util.regex.Pattern;
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private Polygon polygonMap;
-    private Button btnShowCurrentLocation;
-    private Button bthQRCodeScanner;
     private static Button bthGoToTrip;
-
-    private Button bthShowCurrentTrip;
-
     private List<Transport> transports = new ArrayList<>();
-    private Marker selectedMarker; // Выбранный маркер
-
+    private Marker selectedMarker; // Вибраний маркер
     private String  selectedMarkerTitle = "";
     private int selectedTransportType = 1;
     private String currentDate= null;
     private Double userBalance = 0.0;
-
     private boolean isBottomSheetAllowed = true;
     final Handler handler = new Handler();
     final Runnable r = new Runnable() {
@@ -125,8 +118,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void CheckBalance(){
         if(userBalance<0.){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            // Замените "value" на значение вашей переменной
-            String value = "У вас існує заборговоність в сумі "+String.valueOf(userBalance)+". Поповніть свій баланс!";
+            String value = "У вас існує заборговоність в сумі "+ userBalance +". Поповніть свій баланс!";
 
             builder.setMessage(value);
 
@@ -148,7 +140,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         if(polygonMap!=null){
             polygonMap.remove();
         }
-        // Создаем массив с координатами
+        // Створення массив з координатами
         LatLng[] coordinates = new LatLng[10];
         coordinates[0] = new LatLng(49.944961, 28.611455);
         coordinates[1] = new LatLng(49.939776, 28.617922);
@@ -161,31 +153,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         coordinates[8] = new LatLng(49.933163, 28.586319);
         coordinates[9] = new LatLng(49.942839, 28.603362);
 
-        // Создаем объект PolygonOptions
+        // Створення об'єкта PolygonOptions
         PolygonOptions polygonOptions = new PolygonOptions();
         polygonOptions.strokeWidth(5);
         polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
         polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
 
-        // Добавляем координаты в PolygonOptions
+        // Додавання координати в PolygonOptions
         for (LatLng coordinate : coordinates) {
             polygonOptions.add(coordinate);
         }
 
-        //Клікабельність але поки не розібрався
-        //polygonOptions.clickable(true);
-
-
-        // Добавляем полигон на карту
+        // Додаємо полігон на карту
         polygonMap = mMap.addPolygon(polygonOptions);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
+        Button bthQRCodeScanner = view.findViewById(R.id.bthQRCodeScanner);
         bthQRCodeScanner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { scanCode();  }
@@ -193,8 +180,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         bthGoToTrip =  view.findViewById(R.id.GoToTrip);
 
-
-        btnShowCurrentLocation = view.findViewById(R.id.btnShowCurrentLocation);
+        Button btnShowCurrentLocation = view.findViewById(R.id.btnShowCurrentLocation);
         btnShowCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -202,7 +188,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        bthShowCurrentTrip = view.findViewById(R.id.GoToTrip);
+        Button bthShowCurrentTrip = view.findViewById(R.id.GoToTrip);
         bthShowCurrentTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -245,18 +231,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     //Go To Curennt Trip
     public void showCurrentTrip(){
-    //Замінити Фрагмент
-
         Intent myIntent = new Intent(getActivity(), CurrentTripActivity.class);
         getActivity().startActivity(myIntent);
-//
-//        FragmentManager fragmentManager = requireParentFragment().getChildFragmentManager(); // Используйте правильный метод получения FragmentManager
-//        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//        transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
-//
-//        //transaction.replace(R.id.nav_host_fragment_content_main, new CurrentTripFragment());
-//        transaction.commit();
-
     }
 
     ActivityResultLauncher<ScanOptions> barLauncer = registerForActivityResult(new ScanContract(),result ->{
@@ -269,7 +245,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             boolean found = false;
 
             if (matcher.find()) {
-                String value = matcher.group(1); // Получаем значення
+                String value = matcher.group(1);
                 for (Transport transport : transports) {
                     if (transport.getTitle().equals(value) && transport.isFree()) {
                         Marker marker = transport.getMarker();
@@ -306,25 +282,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                // Обработка клика по маркеру
-                String markerId = marker.getTitle(); // Получение id маркера
+                // Обробка кліку по маркеру
+                String markerId = marker.getTitle(); // Отримання id маркера
                 selectedMarker = marker;
 
-                // Отображение нижнего окна активити с текстом и кнопками
+                // Показ нижнього вікна активити з текстом і кнопками
                 showBottomSheet(markerId);
                 return true;
             }
         });
-
-
     }
 
     private void showBottomSheet(String markerId) {
         if (!isBottomSheetAllowed) {
-            // Булева переменная указывает, что отображение нижнего диалогового окна запрещено
+            // Те що відображення нижнього вікна заборонено
             return;
         }
-        // Создание нижнего окна активити
+        // Створення нижнього вікна активити
         Context context = requireContext();
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(context);
 
@@ -405,35 +379,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         textView.setText(markerId);
         bottomSheetTrafic.setText(String.valueOf(Trafic.getTrafic(selectedTransportType)));
 
-        // Настройка текста и обработчиков кнопок
-        // Используйте markerId для получения информации о маркере
-
         bottomSheetDialog.show();
     }
 
     private void ShowDialogBeforeStart(){
         if(userBalance >= 100) {
-            // Создание диалогового окна
+            // Створення діалогового вікна
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Перевірте, чи все добре з транспортом. ");
-            // Установка кнопки "все, хорошо"
+            // Встановлення кнопки "Так все, добре"
             builder.setPositiveButton("Так все, добре.", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Выполнение вашей функции myFunc
+                    // Початок поїздки
                     StartTrip();
                 }
             });
-            // Установка кнопки "отмена"
+            // Встановлення кнопки "Ні"
             builder.setNegativeButton("Ні", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Закрытие диалогового окна
+                    // Закриття діалогового вікна
                     dialog.dismiss();
                 }
             });
 
-        // Создание и отображение диалогового окна
+        // Створення та відображення діалогового вікна.
             AlertDialog dialog = builder.create();
             dialog.show();
         }
@@ -442,8 +413,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    //StartTrip
-
+    //Початок поїздки
     private void StartTrip(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -501,47 +471,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void showCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Запросите разрешения на доступ к местоположению, если они не были предоставлены
+            // Запит разрешения на доступ до місцеположення, якщо їх не було
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
             return;
         }
 
-        // Получите доступ к провайдеру местоположения
-
+        // Отримання доступу до провайдера місцеположення
         mMap.setMyLocationEnabled(true);
         LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-
-        //Passive_Provider or GpS
 
         if (location != null) {
             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
                 //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 mMap.setMyLocationEnabled(true);
                 return;
             }
             mMap.setMyLocationEnabled(true);
-            // Получите широту и долготу текущего местоположения
+            // Отримання широти и довготи поточного місцеположення
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
 
-            // Создайте маркер для текущего местоположения
+            // Створення маркера для поточного місцеположення
             LatLng currentLocation = new LatLng(latitude, longitude);
-          //  MarkerOptions markerOptions = new MarkerOptions().position(currentLocation).title("Мое местоположение");
 
-            // Добавьте маркер на карту
-           // mMap.addMarker(markerOptions);
-
-            // Переместите камеру на текущее местоположение
+            // Переміщенян камери на поточне місцеположення
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
         } else {
-            Toast.makeText(getActivity(), "Не удалось определить текущее местоположение", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Не вдалось отримати поточне місцеположення!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -556,8 +514,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void ShowTransport() {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
-
         for (Transport transport : transports) {
             if (transport.isFree()) {
                 LatLng position = new LatLng(transport.getLatitude(), transport.getLongitude());
@@ -625,11 +581,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void GetCurrentDate(){
-        // Получаем текущую дату и время
+        // Отримуємо дату і час зараз
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-        // Форматируем текущую дату и время в строку
+        // Форматуємо дату і час в String
         currentDate = dateFormat.format(calendar.getTime());
     }
 

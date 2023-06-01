@@ -41,14 +41,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/TripStartedContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
 
         <ImageView
             android:id="@+id/CurrentTripImage"
-            android:layout_width="134dp"
-            android:layout_height="125dp"
+            android:layout_width="199dp"
+            android:layout_height="177dp"
             android:layout_marginStart="138dp"
-            android:layout_marginTop="240dp"
+            android:layout_marginTop="188dp"
             android:layout_marginEnd="139dp"
             android:src="@drawable/ic_electric_scooter"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,8 +63,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="175dp"
             android:layout_marginTop="30dp"
-            android:layout_marginEnd="178dp"
-            android:text="Поїздка іде"
+            android:layout_marginEnd="175dp"
+            android:text="Поїздка відбувається"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/CurrentTripImage" />
@@ -71,10 +73,10 @@
             android:id="@+id/EndTrip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="156dp"
-            android:layout_marginEnd="161dp"
+            android:layout_marginStart="160dp"
+            android:layout_marginEnd="160dp"
             android:layout_marginBottom="99dp"
-            android:text="Закінчити поїздку"
+            android:text="Завершити поїздку"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -83,9 +85,9 @@
             android:id="@+id/textView12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="44dp"
-            android:layout_marginTop="420dp"
-            android:text="Час початку"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="432dp"
+            android:text="Час початку:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -93,18 +95,18 @@
             android:id="@+id/TripDiructionContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="29dp"
-            android:layout_marginTop="52dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginTop="25dp"
             android:text="TextView"
             app:layout_constraintStart_toEndOf="@+id/textView13"
-            app:layout_constraintTop_toBottomOf="@+id/textView91" />
+            app:layout_constraintTop_toBottomOf="@+id/timeStartCurrentTrip" />
 
         <TextView
             android:id="@+id/textView13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="47dp"
-            android:layout_marginTop="21dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="24dp"
             android:text="Тривалість"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView12" />
@@ -113,8 +115,8 @@
             android:id="@+id/timeStartCurrentTrip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
             android:text="TextView"
             app:layout_constraintStart_toEndOf="@+id/textView12"
             app:layout_constraintTop_toBottomOf="@+id/textView91" />
@@ -123,9 +125,9 @@
             android:id="@+id/textView15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="56dp"
+            android:layout_marginStart="40dp"
             android:layout_marginTop="24dp"
-            android:text="Ціна"
+            android:text="Ціна:"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
@@ -133,8 +135,8 @@
             android:id="@+id/costTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="25dp"
+            android:layout_marginStart="68dp"
+            android:layout_marginTop="22dp"
             android:text="TextView"
             app:layout_constraintStart_toEndOf="@+id/textView15"
             app:layout_constraintTop_toBottomOf="@+id/TripDiructionContainer" />

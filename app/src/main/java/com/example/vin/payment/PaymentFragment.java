@@ -42,12 +42,12 @@ public class PaymentFragment extends Fragment {
         payCount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Не используется
+                // Не використовується
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Не используется
+                // Не використовується
             }
 
             @Override
@@ -56,7 +56,7 @@ public class PaymentFragment extends Fragment {
                 int decimalIndex = text.indexOf(".");
 
                 if (decimalIndex != -1 && text.length() - decimalIndex - 1 > 2) {
-                    // Удаляем лишние символы после десятичной точки
+                    // Видаляємо зайві символи після точки
                     s.delete(decimalIndex + 3, s.length());
                 }
             }
@@ -91,7 +91,6 @@ public class PaymentFragment extends Fragment {
             public void onClick(View v) { Checkpay();}
         });
 
-
         return view;
     }
 
@@ -100,23 +99,28 @@ public class PaymentFragment extends Fragment {
     }
 
     private void Checkpay(){
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if(payCount.getText().toString().isEmpty()){
+            Toast.makeText(getActivity(), "Поле для поповнення пусте!", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        Float balance_ = sharedPreferences.getFloat("balance",0);
+            Float balance_ = sharedPreferences.getFloat("balance",0);
 
-        balance = getActivity().findViewById(R.id.BalanceText);
+            balance = getActivity().findViewById(R.id.BalanceText);
 
-        Float add_balance = balance_ + Float.valueOf(payCount.getText().toString());
+            Float add_balance = balance_ + Float.valueOf(payCount.getText().toString());
 
-        editor.putFloat("balance",add_balance);
-        editor.apply();
+            editor.putFloat("balance",add_balance);
+            editor.apply();
 
-        Float new_balance = sharedPreferences.getFloat("balance",0);
+            Float new_balance = sharedPreferences.getFloat("balance",0);
 
-        balance.setText(new_balance.toString());
-        generateQR();
-        Toast.makeText(getActivity(), "Ви успішно поповнили баланс на: "+ payCount.getText().toString()+" грн.", Toast.LENGTH_SHORT).show();
+            balance.setText(new_balance.toString());
+            generateQR();
+            Toast.makeText(getActivity(), "Ви успішно поповнили баланс на: "+ payCount.getText().toString()+" грн.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void generateQR(){

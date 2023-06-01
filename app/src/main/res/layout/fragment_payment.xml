@@ -12,7 +12,7 @@
         android:layout_height="37dp"
         android:layout_gravity="center"
         android:layout_marginBottom="240dp"
-        android:text="Поповненя рахунку"
+        android:text="Поповненя балансу"
         android:textAlignment="center"
         android:textStyle="bold" />
 

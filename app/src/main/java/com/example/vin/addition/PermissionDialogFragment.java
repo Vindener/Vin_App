@@ -34,14 +34,14 @@ public class PermissionDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
 
         if (!isInternetAvailable()) {
-            builder.setMessage("Интернет недоступен").setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+            builder.setMessage("Інтернет вимкнено!").setPositiveButton("ОК", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     openMobileDataSettings(requireContext());
                 }
             });;
         } else if (!isLocationEnabled(requireContext())) {
-            builder.setMessage("Местоположение не включено")
+            builder.setMessage("Місцеположення вимкнено!")
                     .setPositiveButton("ОК", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -55,7 +55,7 @@ public class PermissionDialogFragment extends DialogFragment {
         AlertDialog dialog = builder.create();
         Window window = dialog.getWindow();
 
-        // Отключить возможность взаимодействия за пределами окна
+        // Вимкнути можливість взаємодії за межами вікна
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
         return dialog;
@@ -83,7 +83,6 @@ public class PermissionDialogFragment extends DialogFragment {
     }
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
-        // Ничего не делаем при нажатии на кнопку "Назад"
         getActivity().finishAffinity();
     }
 }

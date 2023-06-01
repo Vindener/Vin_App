@@ -35,7 +35,5 @@ public class LoadActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
         handler.postDelayed(r, 1500);
-
-
     }
 }

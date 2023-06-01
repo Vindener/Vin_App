@@ -55,7 +55,7 @@ public class CameraEndActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_end);
 
-        // Включение кнопки возврата на предыдущую активность
+        // Увімкнення кнопки повернення на попередню активність
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -86,8 +86,7 @@ public class CameraEndActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            // Здесь определите действия при нажатии на кнопку возврата
-            onBackPressed(); // Возврат на предыдущую активность
+            onBackPressed(); // Повернення на попередню активність
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -140,18 +139,16 @@ public class CameraEndActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera();
             } else {
-                Toast.makeText(this, "Доступ к камере отклонен", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Доступ до камери відхилено", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     public void GoToComplete(){
         if(isImageViewEmpty()){
-            Toast.makeText(this, "Перезніміть фотографію", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Перезніміть фотографію!", Toast.LENGTH_SHORT).show();
         }
         else{
-            Toast.makeText(this, "Переход на другую активити", Toast.LENGTH_SHORT).show();
-
             saveImageToGallery();
 
             Intent myIntent = new Intent(CameraEndActivity.this, Complete_Trip_Activity.class);

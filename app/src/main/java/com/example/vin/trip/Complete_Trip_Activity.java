@@ -71,7 +71,6 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         EndTarifTextView.setText(perSec+ " ГРН/хв ");
 
         selectedTransportType = sharedPreferences.getInt("TransportType",1);
-
     }
 
     private void EndTrip(){
@@ -93,17 +92,12 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         editor1.putFloat("balance", (float) new_Balance);
         editor1.apply();
 
-        Toast.makeText(this, " New balance - "+ new_Balance + " cost - "+cost, Toast.LENGTH_SHORT).show();
-
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", false);
         editor.putString("TransportNumber", "");
         editor.putString("selected_marker_title", "");
         editor.putString("durationTrip", "");
         editor.putString("costTrip", "");
-
-
 
         editor.apply();
 

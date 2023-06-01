@@ -19,7 +19,7 @@
     <fragment
         android:id="@+id/nav_payment"
         android:name="com.example.vin.payment.PaymentFragment"
-        android:label="Поповненя рахунку"
+        android:label="Поповненя балансу"
         tools:layout="@layout/fragment_payment" />
 
     <fragment
@@ -37,14 +37,8 @@
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.example.vin.ui.profile.ProfileFragment"
-        android:label="Profile"
+        android:label="Профіль"
         tools:layout="@layout/fragment_profile" />
 
-
-    <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.vin.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
 
 </navigation>

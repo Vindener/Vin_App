@@ -31,7 +31,7 @@ public class ConfirmationDialogFragment  extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Ви бажаєте вийти з облікового запису?")
-                .setPositiveButton("Так", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Так!", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         sendResult(RESULT_YES);
                     }
@@ -44,7 +44,7 @@ public class ConfirmationDialogFragment  extends DialogFragment {
         AlertDialog dialog = builder.create();
         Window window = dialog.getWindow();
 
-        // Отключить возможность взаимодействия за пределами окна
+        // Вимкнути можливість дій за вікном
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
         return dialog;
@@ -57,10 +57,10 @@ public class ConfirmationDialogFragment  extends DialogFragment {
             if (resultCode == Activity.RESULT_OK) {
                 int result = data.getIntExtra("result", -1);
                 if (result == ConfirmationDialogFragment.RESULT_YES) {
-                    // Действия при выборе "Да"
-                    getActivity().finish(); // Закрывает текущую активити
+                    // Дії при "Так"
+                    getActivity().finish(); // Закриває активити
                 } else if (result == ConfirmationDialogFragment.RESULT_NO) {
-                    // Действия при выборе "Нет"
+                    // Дії при "Ні"
                 }
             }
         }
@@ -75,13 +75,18 @@ public class ConfirmationDialogFragment  extends DialogFragment {
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
 
         if (resultCode == RESULT_YES) {
-            // Очистить SharedPreferences
+            // Очистити SharedPreferences
             SharedPreferences preferences = getActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             editor.clear();
             editor.apply();
 
-            // Перейти на LoadActivity
+            SharedPreferences preferences1 = getActivity().getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor1 = preferences1.edit();
+            editor1.clear();
+            editor1.apply();
+
+            // Переходи на LoadActivity
 
             Intent loadIntent = new Intent(getActivity(), LoadActivity.class);
             startActivity(loadIntent);

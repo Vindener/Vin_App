@@ -19,7 +19,6 @@ import com.example.vin.R;
 public class CreateNewUserActivity extends AppCompatActivity {
 
     private Button bth_CreateNewUser;
-
     private String email;
     private String name;
     private String phone;
@@ -39,12 +38,12 @@ public class CreateNewUserActivity extends AppCompatActivity {
         editText2.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // Не используется
+                //Не використовується
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Не используется
+                //Не використовується
             }
 
             @Override
@@ -52,7 +51,7 @@ public class CreateNewUserActivity extends AppCompatActivity {
                 String text = s.toString();
 
                 if (!text.startsWith("380")) {
-                    // Удаление символов, не соответствующих требуемому началу "380"
+                    // Видалення символів, які не відповідають потрібному початку "380"
                     s.replace(0, s.length(), "380");
                 }
             }
@@ -96,6 +95,5 @@ public class CreateNewUserActivity extends AppCompatActivity {
         Intent myIntent = new Intent(CreateNewUserActivity.this, MainActivity.class);
         CreateNewUserActivity.this.startActivity(myIntent);
         finish();
-
     }
 }

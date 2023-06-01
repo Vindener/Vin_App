@@ -10,23 +10,25 @@
         android:id="@+id/verfication_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="179dp"
-        android:layout_marginTop="275dp"
+        android:layout_marginStart="174dp"
+        android:layout_marginTop="23dp"
         android:layout_marginEnd="174dp"
         android:text="Введіть код підтвердження "
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView7" />
 
     <Button
         android:id="@+id/bth_verfication_email"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="158dp"
-        android:layout_marginTop="34dp"
-        android:layout_marginEnd="159dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="158dp"
         android:text="Далі"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Verfication_Email_Code" />
 
@@ -44,4 +46,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/verfication_code" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="192dp"
+        android:layout_height="186dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="110dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_mark_email_unread" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -33,21 +33,14 @@ public class CurrentTripActivity extends AppCompatActivity {
 
     boolean TripStart = false;
     boolean TimerOver = false;
-
     private Button EndTrip;
-
     private String duration;
-
-
-    ConstraintLayout startedContainer,notStartedContainer;
     private  TextView timeStartCurrentTrip,costTextView,TripDiructionContainer,TransportNumber;
     private ImageView CurrentTripImage;
     private  String StartTime;
     private int selectedTransportType;
-
     private Handler handler;
     private Runnable runnable;
-
     private float cost;
 
     @Override
@@ -55,20 +48,19 @@ public class CurrentTripActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_current_trip);
 
-        // Включение кнопки возврата на предыдущую активность
+        // Увімкнення кнопки повернення на попередню активність
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        //SetTitle
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         TripStart = sharedPreferences.getBoolean("TripStart",false);
         String TransportNum = sharedPreferences.getString("TransportNumber","");
 
         StartTime = sharedPreferences.getString("CurrentDateTrip","");
-
-        startedContainer = findViewById(R.id.TripNotStartedContainer);
-        notStartedContainer = findViewById(R.id.TripStartedContainer);
 
         TransportNumber = findViewById(R.id.TransportNumber);
         timeStartCurrentTrip = findViewById(R.id.timeStartCurrentTrip);
@@ -77,8 +69,6 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         timeStartCurrentTrip.setText(StartTime);
         TransportNumber.setText(TransportNum);
-
-        ShowContainer();
 
         EndTrip = findViewById(R.id.EndTrip);
 
@@ -94,23 +84,23 @@ public class CurrentTripActivity extends AppCompatActivity {
         });
 
 
-        // Создать Handler и Runnable для обновления значения timeDifference
+        // Створити Handler та Runnable для оновлення значення timeDifference
         handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
                 if (!TimerOver){
-                // Вычислить разницу времени и установить текст в TextView
+                // Обчислити різницю часу та встановити текст у TextView
                 String timeDifference = calculateTimeDifference();
                 TripDiructionContainer.setText(timeDifference);
 
-                // Вычислить cost и установить текст в TextView
+                // Обчислити cost та встановити текст у TextView
                 double cost = calculateCost();
                 DecimalFormat decimalFormat = new DecimalFormat("#0.00");
                 String formattedCost = decimalFormat.format(cost);
                 costTextView.setText(formattedCost + "грн.");
 
-                // Планировать повторное выполнение через 1 секунду
+                // Планувати повторне виконання через 1 секунду
                 handler.postDelayed(this, 1000);
                 }
                 else{
@@ -119,9 +109,8 @@ public class CurrentTripActivity extends AppCompatActivity {
             }
         };
 
-        // Запустить обновление значения timeDifference
+        //Запустити оновлення значення timeDifference
         handler.post(runnable);
-
     }
 
     private void ShowPicture() {
@@ -134,21 +123,19 @@ public class CurrentTripActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        // Остановить обновление значения timeDifference и cost при уничтожении активити
+        // Зупинити оновлення значення timeDifference та cost при знищенні активіті
         handler.removeCallbacks(runnable);
     }
 
     private String calculateTimeDifference() {
-        // Получить текущую дату и время
+        // Отримати поточну дату та час
         Calendar currentCalendar = Calendar.getInstance();
         Date currentDate = currentCalendar.getTime();
 
-        // Получить дату и время начала таймера
+        // Отримати дату та час початку таймера
         String startDateTime = StartTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date startDate = null;
@@ -159,10 +146,10 @@ public class CurrentTripActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Вычислить разницу в миллисекундах между началом таймера и текущим временем
+        // Обчислити різницю в мілісекундах між початком таймера та поточним часом
         long timeDifferenceInMillis = currentDate.getTime() - startDate.getTime();
 
-        // Преобразовать разницу времени в желаемый формат (часы:минуты:секунды)
+        // Перетворити різницю часу на бажаний формат (години:хвилини:секунди)
         long seconds = timeDifferenceInMillis / 1000;
         long minutes = seconds / 60;
         long hours = minutes / 60;
@@ -174,16 +161,12 @@ public class CurrentTripActivity extends AppCompatActivity {
         return duration;
     }
 
-    //ввести сюди ці значення з серверу
-    private double perces_1 = 4.;
-    private double perces_2 = 3.;
-
     private float calculateCost() {
-        // Получить текущую дату и время
+        // Отримати поточну дату та час
         Calendar currentCalendar = Calendar.getInstance();
         Date currentDate = currentCalendar.getTime();
 
-        // Получить дату и время начала таймера
+        // Отримати дату та час початку таймера
         String startDateTime = StartTime;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date startDate = null;
@@ -194,29 +177,26 @@ public class CurrentTripActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Вычислить разницу в миллисекундах между началом таймера и текущим временем
+        // Обчислити різницю в мілісекундах між початком таймера та поточним часом
         float timeDifferenceInMillis = currentDate.getTime() - startDate.getTime();
 
-        // Вычислить количество секунд
+        // Обчислити кількість секунд
         float seconds = timeDifferenceInMillis / 1000;
 
-            //перевірка на тип
+        //перевірка на тип
         double addperces = 0.0667;
         addperces = Trafic.getTrafic(selectedTransportType)/60.;
 
-        // Умножить количество секунд на 0.6
+        // Помножити кількість секунд на 0.6
         cost = (float) (seconds * addperces);
 
         return cost;
     }
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            // Здесь определите действия при нажатии на кнопку возврата
-            onBackPressed(); // Возврат на предыдущую активность
+            onBackPressed(); // Повернення на попередню активність
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -229,11 +209,10 @@ public class CurrentTripActivity extends AppCompatActivity {
         finish();
     }
 
-
     private void EndTrip(){
         TimerOver = true;
 
-        // Округлить значение cost до двух знаков после точки
+        // Округлити значення cost до двох знаків після точки
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String formattedCost = decimalFormat.format(cost);
 
@@ -250,25 +229,5 @@ public class CurrentTripActivity extends AppCompatActivity {
         Intent myIntent = new Intent(CurrentTripActivity.this, CameraEndActivity.class);
         CurrentTripActivity.this.startActivity(myIntent);
         finish();
-        //ShowContainer();
-    }
-
-    private void ShowContainer(){
-        if (TripStart){
-            Toast.makeText(this, "Поїздка іде!", Toast.LENGTH_SHORT).show();
-
-            startedContainer.setVisibility(View.GONE);
-
-            // Показать startedContainer
-            notStartedContainer.setVisibility(View.VISIBLE);
-        }
-        else{
-            Toast.makeText(this, "Поїздка не іде!", Toast.LENGTH_SHORT).show();
-            // Скрыть startedContainer
-            notStartedContainer.setVisibility(View.GONE);
-
-            // Показать notStartedContainer
-            startedContainer.setVisibility(View.VISIBLE);
-        }
     }
 }

@@ -1,9 +1,6 @@
 package com.example.vin.server;
 
 public class Trafic {
-    //отримати з сервера значення
-    private double perces_1 = 4.;
-    private double perces_2 = 3.;
 
     private String  typeName;
     private double perSec;

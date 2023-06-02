@@ -29,19 +29,19 @@ public class CheckEmailExistsDataTask extends AsyncTask<String, Void, String> {
 
         String email = emails[0];
         try {
-            // Создайте URL-адрес для запроса с параметром email
+            // Створення URL-адресу для запиту з параметром email
             String urlString = API_URL + URLEncoder.encode(email, "UTF-8");
             URL url = new URL(urlString);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Проверьте код ответа сервера
+            // Перевірка коду відповіді сервера
             int responseCode = connection.getResponseCode();
             System.out.println("Response Code: " + responseCode);
 
-            // Прочитайте ответ от сервера
+            // Відповідь від сервера
             InputStream inputStream = connection.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder stringBuilder = new StringBuilder();

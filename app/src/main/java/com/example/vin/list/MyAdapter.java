@@ -35,7 +35,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
         holder.dateTextView.setText(item.getDate());
         holder.timeTextView.setText(item.getTime());
         holder.dirucationTextView.setText(item.getdirucation());
-
     }
 
     @Override
@@ -53,7 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.photoendView);
+            imageView = itemView.findViewById(R.id.listImageView);
             numberTextView = itemView.findViewById(R.id.numberTextView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             dateTextView = itemView.findViewById(R.id.dateTextView);

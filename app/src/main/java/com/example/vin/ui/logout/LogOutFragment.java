@@ -30,7 +30,6 @@ public class LogOutFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         openConfirmationDialog();
 
-
         // Inflate the layout for this fragment
         return view;
     }

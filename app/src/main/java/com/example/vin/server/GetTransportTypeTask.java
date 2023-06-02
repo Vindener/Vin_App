@@ -36,7 +36,7 @@ public class GetTransportTypeTask extends AsyncTask<Void, Void,  List<Trafic>> {
                 }
                 reader.close();
 
-                // Разберите полученный JSON-ответ и создайте объекты Trafic
+                // Розбір отриману JSON-відповідь і створіть об'єкти Trafic
                 JSONArray jsonArray = new JSONArray(response.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject typeTransportData = jsonArray.getJSONObject(i);
@@ -55,7 +55,7 @@ public class GetTransportTypeTask extends AsyncTask<Void, Void,  List<Trafic>> {
             connection.disconnect();
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
+            Log.d("TransportTypeInfo", "Помилка під час отримання даних із сервера.");
         }
 
         return traficList;
@@ -64,15 +64,13 @@ public class GetTransportTypeTask extends AsyncTask<Void, Void,  List<Trafic>> {
     @Override
     protected void onPostExecute(List<Trafic> traficList) {
         if (traficList != null && !traficList.isEmpty()) {
-            // Используйте данные объектов Trafic в активити
+            // Використання даних об'єктів Trafic в активіті
 //            for (Trafic trafic : traficList) {
 //                Log.d("TransportTypeInfo", "Type Name: " + trafic.getTypeName());
 //                Log.d("TransportTypeInfo", "Price of 1: " + trafic.getPriceOf1());
 //            }
-
-            // Другие операции с данными объектов Trafic...
         } else {
-            Log.d("TransportTypeInfo", "Ошибка при получении данных с сервера");
+            Log.d("TransportTypeInfo", "Помилка під час отримання даних із сервера");
         }
     }
 }

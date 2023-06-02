@@ -26,34 +26,34 @@ public class updateTransportStan extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... voids) {
         try {
-            // Создаем URL для запроса
+            // Створення URL для запиту
             String apiUrl = ApiConstants.API_URL+"transport/"+transportIndex;
             URL url = new URL(apiUrl);
 
-            // Создаем соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // Создаем JSON-объект с обновленными значениями
+            // Створення JSON-об'єкт з оновленими значеннями
             JSONObject requestBody = new JSONObject();
             requestBody.put("corX", corX);
             requestBody.put("corY", corY);
             requestBody.put("battery", battery);
             requestBody.put("stan_id", stanId);
 
-            // Записываем JSON-объект в тело запроса
+            // Запис JSON-об'єкт у тіло запиту
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(requestBody.toString().getBytes());
             outputStream.flush();
             outputStream.close();
 
-            // Проверяем код ответа сервера
+            // Перевірка код відповіді сервера
             int responseCode = connection.getResponseCode();
             connection.disconnect();
 
-            // Возвращаем true, если код ответа HTTP 200 (OK)
+            // Повернення true, якщо код відповіді HTTP 200 (OK)
             return responseCode == HttpURLConnection.HTTP_OK;
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,11 +64,11 @@ public class updateTransportStan extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean success) {
         if (success) {
-            // Обновление успешно выполнено
-            System.out.println("Transport updated successfully.");
+            // Оновлення успішно виконано
+            System.out.println("Транспорт успішно оновлено.");
         } else {
-            // Обработка ошибки
-            System.out.println("Failed to update transport.");
+            // Оновлення успішно виконано
+            System.out.println("Не вдалося оновити транспорт.");
         }
     }
 }

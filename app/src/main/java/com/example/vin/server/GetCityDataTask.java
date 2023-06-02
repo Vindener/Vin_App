@@ -93,11 +93,6 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
                     coordinates[18] = coordinatsObject.getDouble("corX_10");
                     coordinates[19] = coordinatsObject.getDouble("corY_10");
 
-                    // Заполните остальные поля координат по аналогии
-                    // coordinates[2] = coordinatsObject.getDouble("corX_3");
-                    // coordinates[3] = coordinatsObject.getDouble("corY_3");
-                    // ...
-
                     city.setCoordinates(coordinates);
 
                     // Добавьте объект City в список
@@ -107,7 +102,6 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return cityList;
     }
 
@@ -115,13 +109,13 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
     protected void onPostExecute(List<City> cityList) {
         if (cityList != null && !cityList.isEmpty()) {
             // Обработка полученных данных
-            for (City city : cityList) {
-                Toast.makeText(context, "City Index: " + city.getCityIndex(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "City Name: " + city.getCityName(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "City coordinates: " + Arrays.toString(city.getCoordinates()), Toast.LENGTH_SHORT).show();
-            }
+//            for (City city : cityList) {
+//                Toast.makeText(context, "City Index: " + city.getCityIndex(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "City Name: " + city.getCityName(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "City coordinates: " + Arrays.toString(city.getCoordinates()), Toast.LENGTH_SHORT).show();
+//            }
         } else {
-            Toast.makeText(context, "Ошибка при получении данных с сервера", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Ошибка при получении данных с сервера", Toast.LENGTH_SHORT).show();
         }
     }
 }

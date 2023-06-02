@@ -12,9 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, List<Trips>> {
@@ -35,22 +33,22 @@ public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, Lis
         String userIndex = params[0];
 
         try {
-            // Создайте URL-адрес для запроса с параметром user_index
+            // Створіть URL-адресу для запиту з параметром user_index
             String urlString = API_URL + userIndex;
             URL url = new URL(urlString);
 
-            // Создайте соединение HTTP
+            // Створіть з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Проверьте код ответа сервера
+            // Перевірте код відповіді сервера
             int responseCode = connection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Получите входной поток данных
+                // Отримати вхідний потік даних
                 InputStream inputStream = connection.getInputStream();
 
-                // Прочтите данные JSON
+                // Прочоитати дані JSON
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
@@ -59,42 +57,37 @@ public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, Lis
                 }
                 reader.close();
 
-                // Обработайте полученные данные JSON
+                // Опрацювати отримані дані JSON
                 JSONArray jsonArray = new JSONArray(stringBuilder.toString());
                 List<Trips> tripsList = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                    // Создайте объект Trips и извлеките значения полей
                     Trips trips = new Trips();
                     trips.setTransportIndex(jsonObject.getInt("transport_id"));
                     trips.setCost(jsonObject.getDouble("cost"));
                     trips.setDuration(jsonObject.getString("duration"));
+                    trips.setTimeStart(jsonObject.getString("time_start"));
+                    trips.setTimeEnd(jsonObject.getString("time_end"));
 
-                    // Обработка даты и времени
-                    String timeStartStr = jsonObject.getString("time_start");
-                    String timeEndStr = jsonObject.getString("time_end");
-
-                    // Получите объект transport
+                    // Отримання об'єкту type_id з транспорту
                     JSONObject transportObject = jsonObject.getJSONObject("transport");
-
-                    // Извлеките значение type_id из объекта transport
                     int typeId = transportObject.getInt("type_id");
                     trips.setTypeId(typeId);
 
-                    // Добавьте объект Trips в список
+                    //Додавання об'єкту Trips до списку
                     tripsList.add(trips);
                 }
 
                 return tripsList;
             } else {
-                // Вывод промежуточной информации в консоль
+                // Виведення проміжної інформації в консоль
                 publishProgress(responseCode);
                 return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Ошибка при получении данных с сервера: " + e.getMessage());
+            System.out.println("Помилка під час отримання даних із сервера: " + e.getMessage());
             return null;
         }
     }
@@ -108,7 +101,7 @@ public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, Lis
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
-        // Вывод промежуточной информации в консоль
+        //Виведення проміжної інформації в консоль
         int responseCode = progress[0];
         System.out.println("Response Code: " + responseCode);
     }

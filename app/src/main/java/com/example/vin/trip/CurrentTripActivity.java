@@ -2,7 +2,6 @@ package com.example.vin.trip;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -15,14 +14,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.vin.MainActivity;
 import com.example.vin.R;
-import com.example.vin.maps.MapsFragment;
-import com.example.vin.maps.Transport;
 import com.example.vin.server.Trafic;
-import com.google.android.gms.maps.model.Marker;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -33,9 +27,10 @@ public class CurrentTripActivity extends AppCompatActivity {
 
     boolean TripStart = false;
     boolean TimerOver = false;
-    private Button EndTrip;
     private String duration;
-    private  TextView timeStartCurrentTrip,costTextView,TripDiructionContainer,TransportNumber;
+    private TextView costTextView;
+    private TextView TripDiructionContainer;
+    private TextView TransportNumber;
     private ImageView CurrentTripImage;
     private  String StartTime;
     private int selectedTransportType;
@@ -54,8 +49,6 @@ public class CurrentTripActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        //SetTitle
-
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         TripStart = sharedPreferences.getBoolean("TripStart",false);
         String TransportNum = sharedPreferences.getString("TransportNumber","");
@@ -63,14 +56,14 @@ public class CurrentTripActivity extends AppCompatActivity {
         StartTime = sharedPreferences.getString("CurrentDateTrip","");
 
         TransportNumber = findViewById(R.id.TransportNumber);
-        timeStartCurrentTrip = findViewById(R.id.timeStartCurrentTrip);
+        TextView timeStartCurrentTrip = findViewById(R.id.timeStartCurrentTrip);
         TripDiructionContainer = findViewById(R.id.TripDiructionContainer);
         costTextView = findViewById(R.id.costTextView);
 
         timeStartCurrentTrip.setText(StartTime);
         TransportNumber.setText(TransportNum);
 
-        EndTrip = findViewById(R.id.EndTrip);
+        Button endTrip = findViewById(R.id.EndTrip);
 
         selectedTransportType = sharedPreferences.getInt("TransportType",1);
 
@@ -78,19 +71,19 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         ShowPicture();
 
-        EndTrip.setOnClickListener(new View.OnClickListener() {
+        endTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { EndTrip();  }
         });
 
 
-        // Створити Handler та Runnable для оновлення значення timeDifference
+        // Створення Handler та Runnable для оновлення значення timeDifference
         handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
                 if (!TimerOver){
-                // Обчислити різницю часу та встановити текст у TextView
+                // Обчислити різницю часу і встановити текст у TextView
                 String timeDifference = calculateTimeDifference();
                 TripDiructionContainer.setText(timeDifference);
 
@@ -109,7 +102,7 @@ public class CurrentTripActivity extends AppCompatActivity {
             }
         };
 
-        //Запустити оновлення значення timeDifference
+        // Запустити оновлення значення timeDifference
         handler.post(runnable);
     }
 
@@ -184,10 +177,9 @@ public class CurrentTripActivity extends AppCompatActivity {
         float seconds = timeDifferenceInMillis / 1000;
 
         //перевірка на тип
-        double addperces = 0.0667;
-        addperces = Trafic.getTrafic(selectedTransportType)/60.;
+        double addperces = Trafic.getTrafic(selectedTransportType)/60.;
 
-        // Помножити кількість секунд на 0.6
+        // Помножити кількість секунд на потрібне
         cost = (float) (seconds * addperces);
 
         return cost;
@@ -217,7 +209,7 @@ public class CurrentTripActivity extends AppCompatActivity {
         DecimalFormat decimalFormat = new DecimalFormat("#0.00");
         String formattedCost = decimalFormat.format(cost);
 
-        // Вычислить итоговое значение времени окончания по добавлению duration к StartTime
+        // Обчислити підсумкове значення часу закінчення з додавання duration до StartTime
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date startDate = null;
         try {
@@ -226,26 +218,26 @@ public class CurrentTripActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // Вычислить дату и время окончания
+        // Обчислити дату і час закінчення
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.setTime(startDate);
 
-        // Разделить duration на часы, минуты и секунды
+        // Розділити duration на години, хвилини та секунди
         String[] timeParts = duration.split(":");
         int hours = Integer.parseInt(timeParts[0]);
         int minutes = Integer.parseInt(timeParts[1]);
         int seconds = Integer.parseInt(timeParts[2]);
 
-        // Добавить часы, минуты и секунды к календарю
+        // Додати години, хвилини та секунди до календаря
         endCalendar.add(Calendar.HOUR_OF_DAY, hours);
         endCalendar.add(Calendar.MINUTE, minutes);
         endCalendar.add(Calendar.SECOND, seconds);
         Date endDate = endCalendar.getTime();
 
-        // Преобразовать дату и время окончания в строку
+        // Перетворити дату і час закінчення в рядок
         String endTime = dateFormat.format(endDate);
 
-        // Сохранить значение endTime в переменной EndTrip
+        // Зберегти значення endTime у змінній EndTrip
         EndTripString = endTime;
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);

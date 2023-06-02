@@ -18,10 +18,10 @@ import com.example.vin.R;
 
 public class CreateNewUserActivity extends AppCompatActivity {
 
-    private Button bth_CreateNewUser;
     private String email;
     private String name;
     private String phone;
+    private int userIndex;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class CreateNewUserActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         email = sharedPreferences.getString("email","");
 
-        bth_CreateNewUser = findViewById(R.id.bth_CreateNewUser);
+        Button bth_CreateNewUser = findViewById(R.id.bth_CreateNewUser);
         EditText editText1 = findViewById(R.id.RegisterUserNameTextView);
         EditText editText2 = findViewById(R.id.RegisterPhoneTextView);
 
@@ -79,7 +79,6 @@ public class CreateNewUserActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public void CreateUser(){
@@ -87,19 +86,16 @@ public class CreateNewUserActivity extends AppCompatActivity {
             @Override
             public void onUserCreated(boolean created) {
                 if (created) {
-                    // Данные пользователя успешно созданы на сервере
-                    Toast.makeText(CreateNewUserActivity.this, "Данные пользователя успешно созданы", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewUserActivity.this, "Користувач успішно зареєстровано!", Toast.LENGTH_SHORT).show();
                 } else {
                     // Ошибка при создании данных пользователя на сервере
-                    Toast.makeText(CreateNewUserActivity.this, "Ошибка при создании данных пользователя", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewUserActivity.this, "Помилка при створенні даних користувача!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         task.execute();
 
         GetProfileInfo();
-
-        Toast.makeText(CreateNewUserActivity.this, "Все добре!", Toast.LENGTH_SHORT).show();
 
         Intent myIntent = new Intent(CreateNewUserActivity.this, MainActivity.class);
         CreateNewUserActivity.this.startActivity(myIntent);
@@ -111,7 +107,6 @@ public class CreateNewUserActivity extends AppCompatActivity {
             @Override
             public void onUserByEmail(User user) {
                 if (user != null) {
-                    // Используйте значения переменных userIndex, phone и name
                     userIndex = user.getUserIndex();
                     phone = user.getPhone();
                     name = user.getName();
@@ -124,9 +119,8 @@ public class CreateNewUserActivity extends AppCompatActivity {
                     editor.putFloat("balance",0 );
                     editor.putBoolean("isFirstRun", false);
                     editor.apply();
-                    // Далее выполните необходимые действия с полученными данными
                 } else {
-                    // Обработка случая, когда пользователь не найден
+                    // Обробка випадку, коли користувач не знайдений
                 }
             }
         });

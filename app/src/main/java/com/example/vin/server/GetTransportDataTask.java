@@ -7,7 +7,6 @@ import android.widget.Toast;
 import com.example.vin.maps.Transport;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -21,39 +20,30 @@ import java.util.List;
 public class GetTransportDataTask extends AsyncTask<Void, Void,  List<Transport>> {
     String API_URL = ApiConstants.API_URL+"transport";
 
-    public String transport_index;
-    public String corX;
-    public String corY;
-    public String stanId;
-    public String typeId;
-    public String qrCode;
-
     private Context context;
 
     public GetTransportDataTask(Context context) {
         this.context = context;
     }
 
-
     @Override
     protected List<Transport> doInBackground(Void... voids) {
         List<Transport> transportList = new ArrayList<>();
 
         try {
-            // Создайте URL-адрес для запроса
+            // Створення URL-адресу для запиту
             URL url = new URL(API_URL);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Проверьте код ответа сервера
+            // Перевірка коду відповіді сервера
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Получите входной поток данных
                 InputStream inputStream = connection.getInputStream();
 
-                // Прочтите данные JSON
+                // Читання даних JSON
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
@@ -62,12 +52,12 @@ public class GetTransportDataTask extends AsyncTask<Void, Void,  List<Transport>
                 }
                 reader.close();
 
-                // Обработайте полученные данные JSON
+                // Обробка отриманих даних JSON
                 JSONArray jsonArray = new JSONArray(stringBuilder.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                    // Создайте объект Transport и извлеките значения полей
+                    // Створнггя об'єкту Transport і витягніть значення полів
                     Transport transport = new Transport();
                     transport.setTitle(String.valueOf(jsonObject.getInt("transport_index")));
                     transport.setLatitude(jsonObject.getDouble("corX"));
@@ -76,7 +66,7 @@ public class GetTransportDataTask extends AsyncTask<Void, Void,  List<Transport>
                     transport.setStan(jsonObject.getInt("stan_id"));
                     transport.setType(jsonObject.getInt("type_id"));
 
-                    // Добавьте объект Transport в список
+                    // Додавання об'єкту Transport до списку
                     transportList.add(transport);
                 }
             }
@@ -87,21 +77,20 @@ public class GetTransportDataTask extends AsyncTask<Void, Void,  List<Transport>
         return transportList;
     }
 
-
     @Override
     protected void onPostExecute(List<Transport> transportList) {
         if (transportList != null && !transportList.isEmpty()) {
-            // Обработка полученных данных
-            for (Transport transport : transportList) {
-                Toast.makeText(context, "Transport Index: " + transport.getTitle(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "CorX: " + transport.getLatitude(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "CorY: " + transport.getLongitude(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "Battery: " + transport.getBattery(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "Stan ID: " + transport.isFree(), Toast.LENGTH_SHORT).show();
-                Toast.makeText(context, "Type ID: " + transport.getType(), Toast.LENGTH_SHORT).show();
-            }
+            // Обробка отриманих даних
+//            for (Transport transport : transportList) {
+//                Toast.makeText(context, "Transport Index: " + transport.getTitle(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "CorX: " + transport.getLatitude(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "CorY: " + transport.getLongitude(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Battery: " + transport.getBattery(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Stan ID: " + transport.isFree(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Type ID: " + transport.getType(), Toast.LENGTH_SHORT).show();
+//            }
         } else {
-            Toast.makeText(context, "Ошибка при получении данных с сервера", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Помилка під час отримання даних із сервера", Toast.LENGTH_SHORT).show();
         }
     }
 

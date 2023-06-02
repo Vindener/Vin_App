@@ -28,27 +28,26 @@ public class UpdateWalletBalanceDataTask extends AsyncTask<Void, Void, Integer> 
         int responseCode = -1;
 
         try {
-            // Создайте URL-адрес для запроса
+            // Створення URL-адресу для запиту
             URL url = new URL(API_URL + indexWallet);
 
-            // Создайте соединение HTTP
+            // З'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("PUT");
             connection.setRequestProperty("Content-Type", "application/json");
 
-            // Создайте JSON-объект для передачи нового значения баланса
+            // Створіть JSON-об'єкт для передачі нового значення балансу
             String jsonInputString = "{\"balance\":" + newBalance + "}";
 
-            // Установите флаг для разрешения вывода данных в запрос
+            // Встановіть прапор для дозволу виведення даних у запит
             connection.setDoOutput(true);
 
-            // Получите выходной поток данных для отправки данных на сервер
+            // Отримайте вихідний потік даних для надсилання даних на сервер
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(jsonInputString.getBytes());
             outputStream.flush();
             outputStream.close();
 
-            // Проверьте код ответа сервера
             responseCode = connection.getResponseCode();
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,13 +58,13 @@ public class UpdateWalletBalanceDataTask extends AsyncTask<Void, Void, Integer> 
 
     @Override
     protected void onPostExecute(Integer responseCode) {
-        // Вывод промежуточной информации в консоль
+        // Виведення проміжної інформації в консоль
         System.out.println("Response Code: " + responseCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
             Toast.makeText(context, "Баланс обновлен успешно", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "Ошибка при обновлении баланса", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Помилка при оновленні баланса", Toast.LENGTH_SHORT).show();
         }
     }
 }

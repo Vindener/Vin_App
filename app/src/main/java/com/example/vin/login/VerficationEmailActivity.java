@@ -12,15 +12,11 @@ import android.widget.Toast;
 
 import com.example.vin.MainActivity;
 import com.example.vin.R;
-import com.example.vin.payment.GetWalletDataTask;
 
 public class VerficationEmailActivity extends AppCompatActivity {
-    private Button bth_verfication_email;
     private String verication_code;
-
     private String email;
     private boolean registered = false;
-
     private int userIndex;
     private String phone,name;
     @Override
@@ -33,7 +29,7 @@ public class VerficationEmailActivity extends AppCompatActivity {
         email = sharedPreferences.getString("email","");
         registered = sharedPreferences.getBoolean("registered",false);
 
-        bth_verfication_email = findViewById(R.id.bth_verfication_email);
+        Button bth_verfication_email = findViewById(R.id.bth_verfication_email);
         bth_verfication_email.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,16 +38,16 @@ public class VerficationEmailActivity extends AppCompatActivity {
                     Toast.makeText(VerficationEmailActivity.this, "Помилка: поле пусте!", Toast.LENGTH_SHORT).show();
                 }
                 else if(verication_code.equals("123456") ){
-                    //якщо такого користувача ще немає
                     if(!registered){
+                        //якщо такого користувача ще немає
+
                         Toast.makeText(VerficationEmailActivity.this, "Перехід на реєстрацію", Toast.LENGTH_SHORT).show();
                         Intent myIntent = new Intent(VerficationEmailActivity.this, CreateNewUserActivity.class);
                         VerficationEmailActivity.this.startActivity(myIntent);
                         finish();
                     }
                     else{
-                        Toast.makeText(VerficationEmailActivity.this, "Перехід на основну", Toast.LENGTH_SHORT).show();
-
+                        // якщо такий користувач існує
                         GetProfileInfo();
 
                         Intent myIntent = new Intent(VerficationEmailActivity.this, MainActivity.class);
@@ -72,7 +68,6 @@ public class VerficationEmailActivity extends AppCompatActivity {
             @Override
             public void onUserByEmail(User user) {
                 if (user != null) {
-                    // Используйте значения переменных userIndex, phone и name
                     userIndex = user.getUserIndex();
                     phone = user.getPhone();
                     name = user.getName();
@@ -86,13 +81,9 @@ public class VerficationEmailActivity extends AppCompatActivity {
                     editor.putBoolean("isFirstRun", false);
                     editor.apply();
 
-                    Toast.makeText(VerficationEmailActivity.this, "Все вийшло", Toast.LENGTH_SHORT).show();
-
-
-                    // Далее выполните необходимые действия с полученными данными
+                    Toast.makeText(VerficationEmailActivity.this, "Все вийшло!", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Обработка случая, когда пользователь не найден
-                    Toast.makeText(VerficationEmailActivity.this, "Пользователь с указанным email не найден", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VerficationEmailActivity.this, "Користувач із зазначеним email не знайдений!", Toast.LENGTH_SHORT).show();
                 }
             }
         });

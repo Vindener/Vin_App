@@ -56,7 +56,7 @@ public class GetWalletDataTask extends AsyncTask<String, Void, Wallet> {
 
                 return wallet;
             } else {
-                // Ошибка при получении данных с сервера
+                // Помилка під час отримання даних із сервера
                 return null;
             }
         } catch (IOException | JSONException e) {
@@ -72,7 +72,6 @@ public class GetWalletDataTask extends AsyncTask<String, Void, Wallet> {
                 listener.onWalletDataReceived(wallet);
             }
         } else {
-            // Ошибка при получении данных с сервера
             if (listener != null) {
                 listener.onWalletDataError();
             }

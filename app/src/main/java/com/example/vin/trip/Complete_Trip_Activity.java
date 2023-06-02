@@ -25,23 +25,19 @@ import com.example.vin.maps.MapsFragment;
 import com.example.vin.payment.UpdateWalletBalanceDataTask;
 import com.example.vin.server.Trafic;
 import com.example.vin.server.updateTransportStan;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 
 public class Complete_Trip_Activity extends AppCompatActivity {
-
-    private Button bthGoToMap;
 
     private TextView EndCost, EndTarifTextView, EndDuration, EndTripCost, EndDurationTrip;
     private ImageView EndTripImage;
     private double new_Balance;
     private int userIndex,transportIndex;
     private double costTrip;
-    private String durationTrip,StartTime,EndTime="2023-05-30T12:00:00Z";
+    private String durationTrip,StartTime,EndTime="2023-01-01";
+    private int batteryTransportLevel = 50;
     private double TransportX= 49.8926838;
     private double TransportY= 28.5903351;
     private int selectedTransportType;
-
     private static final int REQUEST_LOCATION_PERMISSION = 1;
 
     @Override
@@ -49,7 +45,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_complete_trip);
 
-        bthGoToMap = findViewById(R.id.bthGoToMap);
+        Button bthGoToMap = findViewById(R.id.bthGoToMap);
 
         EndCost = findViewById(R.id.EndCost);
         EndTarifTextView = findViewById(R.id.EndTarifTextView);
@@ -59,7 +55,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         EndTripImage = findViewById(R.id.EndTripImage);
 
-        // Проверка разрешений
+        // Перевірка дозволів
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this,
@@ -75,8 +71,6 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         EndTrip();
         EndTripServer();
         ShowPicture();
-
-
         bthGoToMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +85,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         durationTrip = sharedPreferences.getString("durationTrip", "");
         StartTime = sharedPreferences.getString("CurrentDateTrip","");
         EndTime = sharedPreferences.getString("EndTime","");
+        batteryTransportLevel = sharedPreferences.getInt("TransportBattery",50);
 
         String selectedMarkerTitle = sharedPreferences.getString("TransportNumber", "");
         transportIndex= Integer.parseInt(selectedMarkerTitle);
@@ -101,14 +96,11 @@ public class Complete_Trip_Activity extends AppCompatActivity {
 
         EndDurationTrip.setText(durationTrip + "хв.");
 
-        double perSec = 4;
-
-        perSec = Trafic.getTrafic(selectedTransportType);
+        double perSec = Trafic.getTrafic(selectedTransportType);
 
         EndTarifTextView.setText(perSec + " ГРН/хв ");
 
         selectedTransportType = sharedPreferences.getInt("TransportType", 1);
-
     }
 
     private void EndTrip() {
@@ -131,9 +123,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         editor1.putFloat("balance", (float) new_Balance);
         editor1.apply();
 
-        Toast.makeText(this, " New balance - " + new_Balance + " cost - " + costTrip, Toast.LENGTH_SHORT).show();
-
-        updateTransportStan(transportIndex, TransportX, TransportY, 50, 1);
+        updateTransportStan(transportIndex, TransportX, TransportY, batteryTransportLevel, 1);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("TripStart", false);
@@ -166,13 +156,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
     }
 
     public void updateTransportStan(int index, double corX_, double corY_, int battery_, int stan) {
-        int transportIndex = index;
-        double corX = corX_;
-        double corY = corY_;
-        int battery = battery_;
-        int stanId = stan;
-
-        updateTransportStan updateTransportStanTask = new updateTransportStan(transportIndex, corX, corY, battery, stanId);
+        updateTransportStan updateTransportStanTask = new updateTransportStan(index, corX_, corY_, battery_, stan);
         updateTransportStanTask.execute();
     }
 
@@ -188,16 +172,15 @@ public class Complete_Trip_Activity extends AppCompatActivity {
             @Override
             public void onTripCreated(boolean success) {
                 if (success) {
-                    // Поездка успешно создана
-                    Toast.makeText(Complete_Trip_Activity.this, "поїздка  успешно созданы", Toast.LENGTH_SHORT).show();
+                    // Поїздку успішно створено
+                    Toast.makeText(Complete_Trip_Activity.this, "Поїздка  успешно завершена.", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Ошибка при создании поездки
-                    Toast.makeText(Complete_Trip_Activity.this, "Ошибка при создании данных поїздка", Toast.LENGTH_SHORT).show();
+                    // Помилка під час створення поїздки
+                    Toast.makeText(Complete_Trip_Activity.this, "Помилка при створенні даних поїздки.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         createTripTask.execute(String.valueOf(transportIndex), String.valueOf(userIndex), placeId, StartTime, EndTime, durationTrip, String.valueOf(costTrip));
-
     }
 
     private void getCurrentLocation() {
@@ -217,9 +200,6 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         if (location != null) {
             TransportX = location.getLatitude();
             TransportY = location.getLongitude();
-
-            // Используйте полученные координаты по вашему усмотрению
-            // Например, отобразите их в текстовом поле или выполните другие операции
         }
     }
 

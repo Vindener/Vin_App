@@ -1,7 +1,5 @@
 package com.example.vin.list;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 public class Trips {
     private int typeId;
     private int transportIndex;
@@ -26,8 +24,6 @@ public class Trips {
         this.transportIndex = transportIndex;
     }
 
-
-
     public double getCost() {
         return cost;
     }
@@ -48,21 +44,15 @@ public class Trips {
         return timeStart;
     }
 
-    public void setTimeStart(Date timeStart) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        String formattedDate = dateFormat.format(timeStart);
-        this.timeStart = formattedDate;
+    public void setTimeStart(String timeStart) {
+        this.timeStart = timeStart;
     }
 
     public String  getTimeEnd() {
         return timeEnd;
     }
 
-    public void setTimeEnd(Date timeEnd) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        String formattedDate = dateFormat.format(timeEnd);
-        this.timeEnd = formattedDate;
+    public void setTimeEnd(String timeEnd) {
+        this.timeEnd = timeEnd;
     }
-
-    // Дополнительные поля и методы по необходимости
 }

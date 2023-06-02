@@ -9,7 +9,6 @@ public class Transport {
     private double longitude;
     private Marker marker;
     private int type;
-    private int persec;
     private int battery;
 
     public Transport(){
@@ -23,14 +22,6 @@ public class Transport {
         this.longitude = longitude;
         this.type = type;
         this.battery = battery;
-
-        if (type == 1) {
-            persec = 3;
-        } else if (type == 2) {
-            persec = 4;
-        } else {
-            persec = 2;
-        }
     }
 
     public String getTitle() {
@@ -42,10 +33,6 @@ public class Transport {
 
     public boolean isFree() {
         return isFree;
-    }
-
-    public void setFree(boolean free) {
-        isFree = free;
     }
 
     public double getLatitude() {
@@ -80,16 +67,6 @@ public class Transport {
         this.type = type;
     }
 
-    public int getPersec(int type){
-        if (type == 1){
-            return 3;
-        }
-        else if(type == 2){
-            return 4;
-        }
-        return persec;
-    }
-
     public void setBattery(int battery){
         this.battery = battery;
     }
@@ -105,6 +82,5 @@ public class Transport {
             isFree= false;
         }
     }
-
 }
 

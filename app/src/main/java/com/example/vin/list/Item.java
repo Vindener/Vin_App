@@ -12,10 +12,10 @@ public class Item {
 
     public Item(int type, String number, String name, String date, String time, String dirucation) {
         if(type==1){
-            this.image = R.drawable.ic_menu_gallery;
+            this.image = R.drawable.ic_electric_scooter;
         }
         else{
-            this.image = R.drawable.ic_menu_camera;
+            this.image = R.drawable.ic_electric_bike;
         }
         this.number = number;
         this.name = name;

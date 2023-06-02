@@ -14,10 +14,7 @@ import java.net.URL;
 
 public class GetUserByEmailDataTask extends AsyncTask<String, Integer, User> {
     String API_URL = ApiConstants.API_URL+"users/email2/";
-
-
     private OnUserByEmailListener listener;
-
     public GetUserByEmailDataTask(OnUserByEmailListener listener) {
         this.listener = listener;
     }
@@ -30,25 +27,25 @@ public class GetUserByEmailDataTask extends AsyncTask<String, Integer, User> {
 
         String email = emails[0];
         try {
-            // Создайте URL-адрес для запроса с параметром email
+            // Створення URL-адресу для запиту з параметром email
             String urlString = API_URL + email;
             URL url = new URL(urlString);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Проверьте код ответа сервера
+            // Перевірка код відповіді сервера
             int responseCode = connection.getResponseCode();
 
-            // Вывод промежуточной информации в консоль
+            // Виведення проміжної інформації в консоль
             publishProgress(responseCode);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Получите входной поток данных
+                // Отримайте вхідний потік даних
                 InputStream inputStream = connection.getInputStream();
 
-                // Прочтите данные JSON
+                // Отримання даних JSON
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
@@ -57,10 +54,9 @@ public class GetUserByEmailDataTask extends AsyncTask<String, Integer, User> {
                 }
                 reader.close();
 
-                // Обработайте полученные данные JSON
                 JSONObject jsonObject = new JSONObject(stringBuilder.toString());
 
-                // Создайте объект User и извлеките значения полей
+                // Створення об'єкт User і витягніть значення полів
                 User user = new User();
                 user.setUserIndex(jsonObject.getInt("user_index"));
                 user.setPhone(jsonObject.getString("phone"));
@@ -84,7 +80,7 @@ public class GetUserByEmailDataTask extends AsyncTask<String, Integer, User> {
 
     @Override
     protected void onProgressUpdate(Integer... progress) {
-        // Вывод промежуточной информации в консоль
+        // Виведення проміжної інформації в консоль
         int responseCode = progress[0];
         System.out.println("Response Code: " + responseCode);
     }

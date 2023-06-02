@@ -17,9 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class CreateTripDataTask extends AsyncTask<String, Void, Boolean> {
     private String API_URL = ApiConstants.API_URL + "trip";
-
     private OnTripCreatedListener listener;
-
     public CreateTripDataTask(OnTripCreatedListener listener) {
         this.listener = listener;
     }
@@ -39,18 +37,18 @@ public class CreateTripDataTask extends AsyncTask<String, Void, Boolean> {
         String cost = params[6];
 
         try {
-            // Создайте URL-адрес для запроса
+            // Створення URL-адресу для запиту
             URL url = new URL(API_URL);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            // Установите заголовки запроса
+            // Встановлення заголовку запиту
             connection.setRequestProperty("Content-Type", "application/json");
 
-            // Создайте JSON-объект для передачи данных
+            // Створіть JSON-об'єкт для передачі даних
             JSONObject tripJson = new JSONObject();
             tripJson.put("transport_id", transportId);
             tripJson.put("user_id", userId);
@@ -60,15 +58,15 @@ public class CreateTripDataTask extends AsyncTask<String, Void, Boolean> {
             tripJson.put("duration", duration);
             tripJson.put("cost", cost);
 
-            // Преобразуйте JSON-объект в строку
+            // Пперетворення JSON-об'єкт у рядок
             String requestBody = tripJson.toString();
 
-            // Запишите данные в тело запроса
+            // Дані в тіло запиту
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(requestBody.getBytes(StandardCharsets.UTF_8));
             outputStream.close();
 
-            // Проверьте код ответа сервера
+            // Перевірте код відповіді сервера
             int responseCode = connection.getResponseCode();
             System.out.println("Response Code: " + responseCode);
 

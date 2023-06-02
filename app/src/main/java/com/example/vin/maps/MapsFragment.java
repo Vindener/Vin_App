@@ -214,6 +214,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         //Прогрузка інформації користувача
         handler.postDelayed(r, 200);
+        CheckBalance();
         //ShowProfileiInfo();
 
         //addMarker("11",true,49.8926838, 28.5903351,1);

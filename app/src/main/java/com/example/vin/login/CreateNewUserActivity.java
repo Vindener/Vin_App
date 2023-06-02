@@ -87,19 +87,20 @@ public class CreateNewUserActivity extends AppCompatActivity {
             public void onUserCreated(boolean created) {
                 if (created) {
                     Toast.makeText(CreateNewUserActivity.this, "Користувач успішно зареєстровано!", Toast.LENGTH_SHORT).show();
+
+                    //Сюди переставив
+                    GetProfileInfo();
+
+                    Intent myIntent = new Intent(CreateNewUserActivity.this, MainActivity.class);
+                    CreateNewUserActivity.this.startActivity(myIntent);
+                    finish();
                 } else {
                     // Ошибка при создании данных пользователя на сервере
-                    Toast.makeText(CreateNewUserActivity.this, "Помилка при створенні даних користувача!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateNewUserActivity.this, "Помилка при створенні даних користувача! Підключіться до серверу!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         task.execute();
-
-        GetProfileInfo();
-
-        Intent myIntent = new Intent(CreateNewUserActivity.this, MainActivity.class);
-        CreateNewUserActivity.this.startActivity(myIntent);
-        finish();
     }
 
     private void GetProfileInfo(){

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vin.server.ApiConstants;
 import com.google.android.material.snackbar.Snackbar;
@@ -24,6 +25,7 @@ import com.example.vin.databinding.ActivityMainBinding;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        checkServerConnection();
     }
 
     @Override
@@ -67,5 +70,49 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+    private void checkServerConnection() {
+        String serverUrl = ApiConstants.API_URL;
+        int timeout = 3000; // Таймаут підключення у мілісекундах
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(serverUrl);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setConnectTimeout(timeout);
+                    connection.connect();
+
+                    // Підключення успішно
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Підключення успішно
+                        }
+                    });
+
+                    // Закриваємо з'єднання після перевірки
+                    connection.disconnect();
+
+                } catch (UnknownHostException e) {
+                    // Помилка DNS-дозвілу
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Помилка DNS-дозвілу!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (IOException e) {
+                    // Помилка підключення до сервера
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MainActivity.this, "Помилка підключення до сервера!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 }

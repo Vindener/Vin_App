@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.vin.R;
 import com.example.vin.server.Trafic;
@@ -26,6 +27,7 @@ import java.util.Date;
 public class CurrentTripActivity extends AppCompatActivity {
 
     boolean TripStart = false;
+    boolean isInPolygon = true;
     boolean TimerOver = false;
     private String duration;
     private TextView costTextView;
@@ -51,6 +53,7 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences("CurrentTrip", MODE_PRIVATE);
         TripStart = sharedPreferences.getBoolean("TripStart",false);
+        isInPolygon = sharedPreferences.getBoolean("isInPolygon",true);
         String TransportNum = sharedPreferences.getString("TransportNumber","");
 
         StartTime = sharedPreferences.getString("CurrentDateTrip","");
@@ -73,7 +76,14 @@ public class CurrentTripActivity extends AppCompatActivity {
 
         endTrip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { EndTrip();  }
+            public void onClick(View v) {
+                if(isInPolygon){
+                    EndTrip();
+                }
+                else{
+                    Toast.makeText(CurrentTripActivity.this, "Ви не можете завершити поїздку! Поверніться в дозволену зону!", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
 
 

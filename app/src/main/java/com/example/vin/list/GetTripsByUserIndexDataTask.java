@@ -17,7 +17,6 @@ import java.util.List;
 
 public class GetTripsByUserIndexDataTask extends AsyncTask<String , Integer, List<Trips>> {
     private String  API_URL = ApiConstants.API_URL+"trip/";
-
     private OnTripsReceivedListener listener;
 
     public GetTripsByUserIndexDataTask(OnTripsReceivedListener listener) {

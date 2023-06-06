@@ -35,20 +35,20 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
         List<City> cityList = new ArrayList<>();
 
         try {
-            // Создайте URL-адрес для запроса
+            // Створення URL-адресу для запиту
             URL url = new URL(API_URL);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
-            // Проверьте код ответа сервера
+            // Отримання коду відповіді сервера
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Получите входной поток данных
+                // Отримання вхідного потоку даних
                 InputStream inputStream = connection.getInputStream();
 
-                // Прочтите данные JSON
+                // дані JSON
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
@@ -57,20 +57,20 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
                 }
                 reader.close();
 
-                // Обработайте полученные данные JSON
+                // Обробка отриманих даних JSON
                 JSONArray jsonArray = new JSONArray(stringBuilder.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                    // Создайте объект City и извлеките значение поля city
+                    // Створення об'єкту City і витягніть значення поля city
                     City city = new City();
                     city.setCityIndex(jsonObject.getInt("index_place"));
                     city.setCityName(jsonObject.getString("city"));
 
-                    // Извлеките объект координат
+                    // Витягування об'єкту координат
                     JSONObject coordinatsObject = jsonObject.getJSONObject("coordinats");
 
-                    // Извлеките и добавьте поля координат в массив класса City
+                    // Поля координат у масив класу City
                     double[] coordinates = new double[20];
                     coordinates[0] = coordinatsObject.getDouble("corX_1");
                     coordinates[1] = coordinatsObject.getDouble("corY_1");
@@ -95,7 +95,7 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
 
                     city.setCoordinates(coordinates);
 
-                    // Добавьте объект City в список
+                    // Додавання об'єкту City до списку
                     cityList.add(city);
                 }
             }
@@ -108,7 +108,7 @@ public class GetCityDataTask extends AsyncTask<Void, Void, List<City>> {
     @Override
     protected void onPostExecute(List<City> cityList) {
         if (cityList != null && !cityList.isEmpty()) {
-            // Обработка полученных данных
+            // Обробка отриманих даних
 //            for (City city : cityList) {
 //                Toast.makeText(context, "City Index: " + city.getCityIndex(), Toast.LENGTH_SHORT).show();
 //                Toast.makeText(context, "City Name: " + city.getCityName(), Toast.LENGTH_SHORT).show();

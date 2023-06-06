@@ -24,14 +24,13 @@ import com.example.vin.R;
 public class ConfirmationDialogFragment  extends DialogFragment {
     public static final int RESULT_YES = 1;
     public static final int RESULT_NO = 0;
-
     public static final int REQUEST_CONFIRMATION = 1;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Ви бажаєте вийти з облікового запису?")
-                .setPositiveButton("Так!", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Так", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         sendResult(RESULT_YES);
                     }

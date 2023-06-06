@@ -14,7 +14,6 @@ import java.net.URLEncoder;
 
 public class CheckEmailExistsDataTask extends AsyncTask<String, Void, String> {
     String API_URL = ApiConstants.API_URL+"users/email/";
-
     private OnEmailExistsListener listener;
 
     public CheckEmailExistsDataTask(OnEmailExistsListener listener) {

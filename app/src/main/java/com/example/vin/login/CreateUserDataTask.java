@@ -29,20 +29,20 @@ public class CreateUserDataTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... voids) {
         try {
-            // Создайте URL-адрес для запроса
+            // Створення URL-адресу для запиту
             URL url = new URL(API_URL);
 
-            // Создайте соединение HTTP
+            // Створення з'єднання HTTP
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
-            // Установите параметры запроса
+            // Встановлення параметри запиту
             String postData = "email=" + URLEncoder.encode(email, "UTF-8") +
                     "&phone=" + URLEncoder.encode(phone, "UTF-8") +
                     "&name=" + URLEncoder.encode(name, "UTF-8");
 
-            // Запишите параметры запроса в тело запроса
+            // Параметри запиту в тіло запиту
             OutputStream outputStream = connection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             writer.write(postData);
@@ -50,7 +50,7 @@ public class CreateUserDataTask extends AsyncTask<Void, Void, Boolean> {
             writer.close();
             outputStream.close();
 
-            // Проверьте код ответа сервера
+            // Отримання коду відповіді сервера
             int responseCode = connection.getResponseCode();
             System.out.println("Response Code: " + responseCode);
 

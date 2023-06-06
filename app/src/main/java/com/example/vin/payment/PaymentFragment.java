@@ -47,7 +47,6 @@ public class PaymentFragment extends Fragment {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // Не використовується
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Не використовується

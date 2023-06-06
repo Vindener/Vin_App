@@ -95,7 +95,7 @@ public class CreateNewUserActivity extends AppCompatActivity {
                     CreateNewUserActivity.this.startActivity(myIntent);
                     finish();
                 } else {
-                    // Ошибка при создании данных пользователя на сервере
+                    // Помилка під час створення даних користувача на сервері
                     Toast.makeText(CreateNewUserActivity.this, "Помилка при створенні даних користувача! Підключіться до серверу!", Toast.LENGTH_SHORT).show();
                 }
             }

@@ -173,10 +173,10 @@ public class Complete_Trip_Activity extends AppCompatActivity {
             public void onTripCreated(boolean success) {
                 if (success) {
                     // Поїздку успішно створено
-                    Toast.makeText(Complete_Trip_Activity.this, "Поїздка  успешно завершена.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Complete_Trip_Activity.this, "Поїздку успешно завершено.", Toast.LENGTH_SHORT).show();
                 } else {
                     // Помилка під час створення поїздки
-                    Toast.makeText(Complete_Trip_Activity.this, "Помилка при створенні даних поїздки.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Complete_Trip_Activity.this, "Помилка при створенні даних про поїздку.", Toast.LENGTH_SHORT).show();
                 }
             }
         });

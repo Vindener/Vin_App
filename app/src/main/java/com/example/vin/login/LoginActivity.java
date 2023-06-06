@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onEmailExists(boolean exists) {
                 if (exists) {
                     // Зазначений email вже існує
-                    Toast.makeText(LoginActivity.this, "Існує вже такий емайл: ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Існує вже такий емайл", Toast.LENGTH_SHORT).show();
 
                     editor.putString("email", email);
                     editor.putBoolean("registered",true);
@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
                 } else {
                     // Зазначений email не існує
-                    Toast.makeText(LoginActivity.this, "Не існує ще такий емайл: ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Не існує ще такий емайл", Toast.LENGTH_SHORT).show();
 
                     editor.putString("email", email);
                     editor.putBoolean("registered",false);

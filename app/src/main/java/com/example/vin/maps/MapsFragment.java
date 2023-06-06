@@ -19,6 +19,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -60,6 +61,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.maps.android.PolyUtil;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -75,6 +77,7 @@ import java.util.regex.Pattern;
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private LatLng currentLocationForCheck = null;
     private Polygon polygonMap;
     private static Button bthGoToTrip;
     private List<Transport> transports = new ArrayList<>();
@@ -108,6 +111,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         //Перевірка на доступність місцеположення
         CheckPermissions();
         CheckBalance();
+        checkInPolygon();
     }
 
     //Internet
@@ -146,7 +150,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             dialog.show();
         }
     }
-
 
     public void DrawPolygon(){
         if(polygonMap!=null){
@@ -218,7 +221,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         //ShowProfileiInfo();
 
         //addMarker("11",true,49.8926838, 28.5903351,1);
-        //addMarker("12",true,49.892613, 28.590552,2);
 
         return view;
     }
@@ -316,7 +318,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         ImageView batteryImage = bottomSheetDialog.findViewById(R.id.baterryImage);
 
         ImageView bottomSheetImage = bottomSheetDialog.findViewById(R.id.bottomSheetImage);
-        int batteryValueLevel;
 
         double traficPrice = 3.;
 
@@ -403,7 +404,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private double TransportY;
 
     private void ShowDialogBeforeStart(){
-        if(userBalance >= 100) {
+        checkInPolygon();
+        if(userBalance >= 100 && isInPolygon) {
             // Створення діалогового вікна
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Перевірте, чи все добре з транспортом. ");
@@ -428,8 +430,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
-        else{
+        else if(userBalance<100){
             Toast.makeText(getActivity(), "Для початку поїздку ви повинні мати як мінімум на балнасі 100 грн!", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getActivity(), "Ви поза дозволеною зоною!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -488,7 +492,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
     private static final int REQUEST_LOCATION_PERMISSION = 123;
     private void showCurrentLocation() {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -516,10 +519,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             double longitude = location.getLongitude();
 
             // Створення маркера для поточного місцеположення
-            LatLng currentLocation = new LatLng(latitude, longitude);
+            currentLocationForCheck = new LatLng(latitude, longitude);
 
             // Переміщенян камери на поточне місцеположення
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocationForCheck, 15));
         } else {
             Toast.makeText(getActivity(), "Не вдалось отримати поточне місцеположення!", Toast.LENGTH_SHORT).show();
         }
@@ -731,5 +734,67 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             }
         });
         task.execute(String.valueOf(userIndex));
+    }
+
+    private void showAlertAndPlaySound() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Ви поза дозволеною зоною!");
+        builder.setMessage("Ваше місцезнаходження не відповідає дозволеним межам поїздки! Будь ласка поверніться та поставте самокат в дозволеному місці.");
+        builder.setPositiveButton("OK", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        MediaPlayer mediaPlayer = MediaPlayer.create(getActivity(), R.raw.alert);
+        mediaPlayer.start();
+    }
+
+    boolean isInPolygon = false;
+
+    public void checkInPolygon(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("CurrentTrip", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        boolean TripStarted = sharedPreferences.getBoolean("TripStart",false);
+
+        GetCityDataTask task = new GetCityDataTask(getContext()) {
+            @Override
+            protected void onPostExecute(List<City> result) {
+                // Отримання дані та оновіть список об'єктів City
+                cityList = result;
+
+                for (City city : cityList) {
+                    double[] coordinates = city.getCoordinates();
+
+                    // Створюємо об'єкт PolygonOptions для поточного об'єкта City
+                    PolygonOptions polygonOptions = new PolygonOptions();
+                    polygonOptions.strokeWidth(5);
+                    polygonOptions.strokeColor(Color.argb(160, 255, 0, 0));
+                    polygonOptions.fillColor(Color.argb(50, 0, 255, 0)); // Задаем полупрозрачный зеленый цвет (128 - уровень прозрачности)
+
+                    // Додаємо координати в PolygonOptions
+                    for (int i = 0; i < coordinates.length; i += 2) {
+                        double latitude = coordinates[i];
+                        double longitude = coordinates[i + 1];
+                        LatLng coordinate = new LatLng(latitude, longitude);
+                        polygonOptions.add(coordinate);
+                    }
+
+                    if (PolyUtil.containsLocation(currentLocationForCheck, polygonMap.getPoints(), true)) {
+                        isInPolygon = true;
+                        editor.putBoolean("isInPolygon", true);
+                        editor.apply();
+                        break;
+                    }
+                }
+
+                if (!isInPolygon && TripStarted) {
+                    showAlertAndPlaySound();
+
+                    editor.putBoolean("isInPolygon", false);
+                    editor.apply();
+                }
+            }
+        };
+        task.execute();
     }
 }

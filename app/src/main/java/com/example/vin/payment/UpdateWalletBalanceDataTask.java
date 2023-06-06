@@ -62,9 +62,9 @@ public class UpdateWalletBalanceDataTask extends AsyncTask<Void, Void, Integer> 
         System.out.println("Response Code: " + responseCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            Toast.makeText(context, "Баланс обновлен успешно", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Баланс успішно змінено!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(context, "Помилка при оновленні баланса", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Помилка при оновлені балансу!", Toast.LENGTH_SHORT).show();
         }
     }
 }

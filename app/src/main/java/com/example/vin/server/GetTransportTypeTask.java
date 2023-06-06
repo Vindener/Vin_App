@@ -36,7 +36,7 @@ public class GetTransportTypeTask extends AsyncTask<Void, Void,  List<Trafic>> {
                 }
                 reader.close();
 
-                // Розбір отриману JSON-відповідь і створіть об'єкти Trafic
+                // Розбір отриманої JSON-відповіді і створення об'єкту Trafic
                 JSONArray jsonArray = new JSONArray(response.toString());
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject typeTransportData = jsonArray.getJSONObject(i);

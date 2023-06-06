@@ -94,7 +94,7 @@ public class Complete_Trip_Activity extends AppCompatActivity {
         EndDuration.setText("* " + durationTrip + "хв.");
         EndTripCost.setText("= " + costString);
 
-        EndDurationTrip.setText(durationTrip + "хв.");
+        EndDurationTrip.setText(durationTrip);
 
         double perSec = Trafic.getTrafic(selectedTransportType);
 

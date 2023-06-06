@@ -46,7 +46,6 @@ public class ProfileFragment extends Fragment {
         final EditText name = binding.UserName;
         name.setText(name_);
 
-
         return root;
     }
 
